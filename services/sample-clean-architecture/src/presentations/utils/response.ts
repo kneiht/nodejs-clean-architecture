@@ -68,8 +68,8 @@ export function sendUpdated<T>(
 // Deleted response helper
 export function sendDeleted<T>(
   res: Response,
-  data: T,
   message = 'Deleted successfully',
+  data?: T,
   httpStatus = 200,
 ) {
   return sendSuccess(res, data, message, httpStatus);

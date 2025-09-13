@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-
 import { IUseCase } from '@/application/use-cases/use-case.interface.js';
 import {
   AddUserUseCaseInput,

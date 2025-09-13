@@ -2,7 +2,23 @@ import { User } from '@/entities/user.entity.js';
 import { IUserRepository } from '@/application/dependency-interfaces/repositories/user.repository.js';
 
 export class UserInMemoryRepository implements IUserRepository {
-  private users: User[] = [];
+  private users: User[] = [
+    new User({
+      email: 'user1@example.com',
+      name: 'User 1',
+      passwordHash: 'passwordHash1',
+    }),
+    new User({
+      email: 'user2@example.com',
+      name: 'User 2',
+      passwordHash: 'passwordHash2',
+    }),
+    new User({
+      email: 'user3@example.com',
+      name: 'User 3',
+      passwordHash: 'passwordHash3',
+    }),
+  ];
 
   async findById(id: string): Promise<User | null> {
     return this.users.find((user) => user.id === id) || null;

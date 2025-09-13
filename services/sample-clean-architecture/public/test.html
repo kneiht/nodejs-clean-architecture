@@ -1,75 +1,101 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API Test Page</title>
+  <title>User API Test Page</title>
   <style>
-    body { font-family: sans-serif; margin: 2em; background-color: #f4f4f9; }
-    h1, h2 { color: #333; }
-    div { background-color: #fff; border: 1px solid #ddd; padding: 1em; margin-bottom: 1em; border-radius: 5px; }
-    button { padding: 0.5em 1em; border: none; background-color: #007bff; color: white; border-radius: 3px; cursor: pointer; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 2em; background-color: #f4f4f9; color: #333; }
+    h1, h2 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+    .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2em; }
+    .card { background-color: #fff; border: 1px solid #ddd; padding: 1.5em; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    button { padding: 0.6em 1.2em; border: none; background-color: #007bff; color: white; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
     button:hover { background-color: #0056b3; }
-    input { padding: 0.5em; margin-right: 0.5em; border: 1px solid #ccc; border-radius: 3px; }
-    pre { background-color: #eee; padding: 1em; border-radius: 3px; white-space: pre-wrap; word-wrap: break-word; }
-    form { margin-bottom: 1em; }
+    button.danger { background-color: #dc3545; }
+    button.danger:hover { background-color: #c82333; }
+    input { width: calc(100% - 1.2em); padding: 0.6em; margin-bottom: 0.5em; border: 1px solid #ccc; border-radius: 5px; }
+    pre { background-color: #2d2d2d; color: #f1f1f1; padding: 1em; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; font-family: 'Fira Code', 'Courier New', Courier, monospace; }
+    form { display: flex; flex-direction: column; }
   </style>
 </head>
 <body>
 
-  <h1>API Test Page</h1>
+  <h1>User API Test Page</h1>
 
-  <!-- Get All Users -->
-  <div>
-    <h2>Get All Users</h2>
-    <button id="get-users-btn">Fetch Users</button>
-    <h3>Result:</h3>
-    <pre id="get-users-result"></pre>
-  </div>
+  <div class="container">
+    <!-- Get All Users -->
+    <div class="card">
+      <h2>Get All Users</h2>
+      <button id="get-users-btn">Fetch All Users</button>
+      <h3>Result:</h3>
+      <pre id="get-users-result">Click the button to see all users.</pre>
+    </div>
 
-  <!-- Create User -->
-  <div>
-    <h2>Create User</h2>
-    <form id="create-user-form">
-      <input type="text" id="create-name" placeholder="Name" required>
-      <input type="email" id="create-email" placeholder="Email" required>
-      <input type="password" id="create-password" placeholder="Password" required>
-      <button type="submit">Create User</button>
-    </form>
-    <h3>Result:</h3>
-    <pre id="create-user-result"></pre>
-  </div>
+    <!-- Create User -->
+    <div class="card">
+      <h2>Create User</h2>
+      <form id="create-user-form">
+        <input type="text" id="create-name" placeholder="Name" required>
+        <input type="email" id="create-email" placeholder="Email" required>
+        <input type="password" id="create-password" placeholder="Password (min 8 chars)" required>
+        <button type="submit">Create User</button>
+      </form>
+      <h3>Result:</h3>
+      <pre id="create-user-result"></pre>
+    </div>
 
-  <!-- Update User -->
-  <div>
-    <h2>Update User</h2>
-    <form id="update-user-form">
-      <input type="text" id="update-id" placeholder="User ID" required>
-      <input type="text" id="update-name" placeholder="New Name">
-      <input type="email" id="update-email" placeholder="New Email">
-      <button type="submit">Update User</button>
-    </form>
-    <h3>Result:</h3>
-    <pre id="update-user-result"></pre>
+    <!-- Get User by ID -->
+    <div class="card">
+      <h2>Get/Delete by ID</h2>
+      <form id="get-delete-user-form">
+        <input type="text" id="user-id" placeholder="User ID" required>
+        <button type="button" id="get-user-by-id-btn">Get User</button>
+        <button type="button" id="delete-user-btn" class="danger" style="margin-top: 5px;">Delete User</button>
+      </form>
+      <h3>Result:</h3>
+      <pre id="get-delete-user-result"></pre>
+    </div>
+
+    <!-- Update User -->
+    <div class="card">
+      <h2>Update User</h2>
+      <form id="update-user-form">
+        <input type="text" id="update-id" placeholder="User ID to Update" required>
+        <input type="text" id="update-name" placeholder="New Name (optional)">
+        <input type="email" id="update-email" placeholder="New Email (optional)">
+        <button type="submit">Update User</button>
+      </form>
+      <h3>Result:</h3>
+      <pre id="update-user-result"></pre>
+    </div>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const API_URL = 'http://localhost:3000';
 
+      const displayResult = (element, data) => {
+        if (typeof data === 'string') {
+          element.textContent = data;
+          return;
+        }
+        element.textContent = JSON.stringify(data, null, 2);
+      };
+
       // --- Get All Users ---
       const getUsersBtn = document.getElementById('get-users-btn');
       const getUsersResult = document.getElementById('get-users-result');
-      getUsersBtn.addEventListener('click', async () => {
+      const fetchAllUsers = async () => {
         try {
+          getUsersResult.textContent = 'Loading...';
           const response = await fetch(`${API_URL}/users`);
           const data = await response.json();
-          getUsersResult.textContent = JSON.stringify(data, null, 2);
+          displayResult(getUsersResult, data);
         } catch (error) {
-          getUsersResult.textContent = `Error: ${error.message}`;
+          displayResult(getUsersResult, `Error: ${error.message}`);
         }
-      });
+      };
+      getUsersBtn.addEventListener('click', fetchAllUsers);
 
       // --- Create User ---
       const createUserForm = document.getElementById('create-user-form');
@@ -86,10 +112,40 @@
             body: JSON.stringify({ name, email, password }),
           });
           const data = await response.json();
-          createUserResult.textContent = JSON.stringify(data, null, 2);
-          getUsersBtn.click(); // Refresh user list
+          displayResult(createUserResult, data);
+          if(response.ok) fetchAllUsers(); // Refresh user list
         } catch (error) {
-          createUserResult.textContent = `Error: ${error.message}`;
+          displayResult(createUserResult, `Error: ${error.message}`);
+        }
+      });
+
+      // --- Get User by ID ---
+      const getUserByIdBtn = document.getElementById('get-user-by-id-btn');
+      const getDeleteUserResult = document.getElementById('get-delete-user-result');
+      getUserByIdBtn.addEventListener('click', async () => {
+        const id = document.getElementById('user-id').value;
+        if (!id) { displayResult(getDeleteUserResult, 'Please enter a User ID.'); return; }
+        try {
+          const response = await fetch(`${API_URL}/users/${id}`);
+          const data = await response.json();
+          displayResult(getDeleteUserResult, data);
+        } catch (error) {
+          displayResult(getDeleteUserResult, `Error: ${error.message}`);
+        }
+      });
+
+      // --- Delete User ---
+      const deleteUserBtn = document.getElementById('delete-user-btn');
+      deleteUserBtn.addEventListener('click', async () => {
+        const id = document.getElementById('user-id').value;
+        if (!id) { displayResult(getDeleteUserResult, 'Please enter a User ID.'); return; }
+        if (!confirm(`Are you sure you want to delete user ${id}?`)) return;
+        try {
+          const response = await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' });
+          displayResult(getDeleteUserResult, `Status: ${response.status} ${response.statusText}`);
+          if(response.ok) fetchAllUsers(); // Refresh user list
+        } catch (error) {
+          displayResult(getDeleteUserResult, `Error: ${error.message}`);
         }
       });
 
@@ -106,6 +162,11 @@
         if (name) body.name = name;
         if (email) body.email = email;
 
+        if (Object.keys(body).length === 0) {
+          displayResult(updateUserResult, 'Please provide a new name or email to update.');
+          return;
+        }
+
         try {
           const response = await fetch(`${API_URL}/users/${id}`, {
             method: 'PATCH',
@@ -113,12 +174,15 @@
             body: JSON.stringify(body),
           });
           const data = await response.json();
-          updateUserResult.textContent = JSON.stringify(data, null, 2);
-          getUsersBtn.click(); // Refresh user list
+          displayResult(updateUserResult, data);
+          if(response.ok) fetchAllUsers(); // Refresh user list
         } catch (error) {
-          updateUserResult.textContent = `Error: ${error.message}`;
+          displayResult(updateUserResult, `Error: ${error.message}`);
         }
       });
+
+      // Initial fetch
+      fetchAllUsers();
     });
   </script>
 
