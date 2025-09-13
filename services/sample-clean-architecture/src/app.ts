@@ -1,28 +1,25 @@
 import express from 'express';
-import { UserCreationController } from '@/adapters/controllers/user/user-creation.controller.js';
-import { AddUserUseCase } from '@/application/use-cases/user/add.use-case.js';
-import { UserInMemoryRepository } from '@/adapters/repositories/user.repository.js';
-import { PasswordHasher } from '@/adapters/utils/password.js';
+
+import { logger } from './presentations/middlewares/logger.js';
+import { errorHandler } from './presentations/middlewares/error-handler.js';
+import userRoutes from './presentations/routes/user.routes.js';
 
 // Express
 const app = express();
+
+// Middlewares
+app.use(logger);
 app.use(express.json());
+app.use(express.static('public'));
 
-// Dependencies
-const passwordHasher = new PasswordHasher();
-const userRepository = new UserInMemoryRepository();
-
-// Use Case
-const addUserUseCase = new AddUserUseCase(userRepository, passwordHasher);
-
-// Controller
-const userCreationController = new UserCreationController(addUserUseCase);
-
+// Routes
+app.use('/users', userRoutes);
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.get('/users', userCreationController.execute);
+// Error handler
+app.use(errorHandler);
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000');

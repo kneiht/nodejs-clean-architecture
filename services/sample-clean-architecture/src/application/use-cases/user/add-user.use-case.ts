@@ -29,6 +29,8 @@ export class AddUserUseCase implements IUseCase<AddUserUseCaseInput, AddUserUseC
       passwordHash: await this.passwordHasher.hash(input.password),
     });
 
+    await this.userRepository.add(user);
+
     return user;
   }
 }
