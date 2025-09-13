@@ -6,7 +6,7 @@ import {
 } from '@/application/use-cases/user/add-user.use-case.js';
 import { sendCreated } from '@/presentations/utils/response.js';
 
-export class UserCreationController {
+export class AddUserController {
   constructor(private addUserUseCase: IUseCase<AddUserUseCaseInput, AddUserUseCaseOutput>) {}
 
   async execute(req: Request, res: Response): Promise<Response> {

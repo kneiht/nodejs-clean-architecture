@@ -3,7 +3,7 @@ import { IUseCase } from '@/application/use-cases/use-case.interface.js';
 import { User } from '@/entities/user.entity.js';
 import { sendSuccess } from '@/presentations/utils/response.js';
 
-export class UserListingController {
+export class GetAllUsersController {
   constructor(private getAllUsersUseCase: IUseCase<void, User[]>) {}
 
   async execute(req: Request, res: Response): Promise<Response> {

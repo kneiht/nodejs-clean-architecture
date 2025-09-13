@@ -12,11 +12,11 @@ import {
 
 // User controllers
 import {
-  UserCreationController,
-  UserListingController,
-  UserDetailsController,
-  UserUpdatingController,
-  UserDeletionController,
+  AddUserController,
+  GetAllUsersController,
+  GetUserByIdController,
+  UpdateUserController,
+  DeleteUserController,
 } from '@/adapters/controllers/index.js';
 
 // Adapters
@@ -31,17 +31,17 @@ const updateUserUseCase = new UpdateUserUseCase(userRepository);
 const deleteUserUseCase = new DeleteUserUseCase(userRepository);
 
 // Controllers
-const userCreationController = new UserCreationController(addUserUseCase);
-const userListingController = new UserListingController(getAllUsersUseCase);
-const userDetailsController = new UserDetailsController(getUserByIdUseCase);
-const userUpdatingController = new UserUpdatingController(updateUserUseCase);
-const userDeletionController = new UserDeletionController(deleteUserUseCase);
+const addUserController = new AddUserController(addUserUseCase);
+const getAllUsersController = new GetAllUsersController(getAllUsersUseCase);
+const getUserByIdController = new GetUserByIdController(getUserByIdUseCase);
+const updateUserController = new UpdateUserController(updateUserUseCase);
+const deleteUserController = new DeleteUserController(deleteUserUseCase);
 
 // Export controllers instances
 export {
-  userCreationController,
-  userListingController,
-  userDetailsController,
-  userUpdatingController,
-  userDeletionController,
+  addUserController,
+  getAllUsersController,
+  getUserByIdController,
+  updateUserController,
+  deleteUserController,
 };
