@@ -1,9 +1,9 @@
 import express from 'express';
+import { logger } from './adapters/express/middlewares/logger.middleware.js';
+import { errorHandler } from './adapters/express/middlewares/error-handler.middleware.js';
 
-import { logger } from './presentations/middlewares/logger.js';
-import { errorHandler } from './presentations/middlewares/error-handler.js';
-import userRoutes from './presentations/routes/user.routes.js';
-import authRoutes from './presentations/routes/auth.routes.js';
+import userRoutes from './adapters/express/routes/user.routes.js';
+import authRoutes from './adapters/express/routes/auth.routes.js';
 
 // Express
 const app = express();

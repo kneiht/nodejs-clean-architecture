@@ -24,7 +24,6 @@ export class RegisterUseCase implements IUseCase<RegisterUseCaseInput, RegisterU
   ) {}
   async execute(input: RegisterUseCaseInput): Promise<RegisterUseCaseOutput> {
     const user = await this.addUserUseCase.execute(input);
-
     const accessToken = await this.jsonWebToken.sign(
       { id: user.id, email: user.email, name: user.name },
       ExpiresIn.ONE_HOUR,

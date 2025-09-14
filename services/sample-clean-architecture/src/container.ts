@@ -1,7 +1,8 @@
 import { UserInMemoryRepository } from '@/adapters/repositories/user.repository.js';
 import { PasswordHasher } from '@/adapters/utils/password.js';
+import { JsonWebToken } from '@/adapters/utils/jwt.js';
 
-// User use cases
+// User use cases classes
 import {
   AddUserUseCase,
   GetAllUsersUseCase,
@@ -10,23 +11,10 @@ import {
   DeleteUserUseCase,
 } from '@/application/use-cases/index.js';
 
-// User controllers
-import {
-  AddUserController,
-  GetAllUsersController,
-  GetUserByIdController,
-  UpdateUserController,
-  DeleteUserController,
-} from '@/adapters/controllers/index.js';
-
-// Auth use cases
+// Auth use cases classes
 import { RegisterUseCase } from '@/application/use-cases/auth/register.use-case.js';
 import { LoginUseCase } from '@/application/use-cases/auth/login.use-case.js';
-
-// Auth controllers
-import { RegisterController } from '@/adapters/controllers/auth/register.controller.js';
-import { LoginController } from '@/adapters/controllers/auth/login.controller.js';
-import { JsonWebToken } from '@/adapters/utils/jwt.js';
+import { CheckAuthUseCase } from '@/application/use-cases/auth/check-auth.use-case.js';
 
 // Adapters
 const passwordHasher = new PasswordHasher();
@@ -43,26 +31,15 @@ const deleteUserUseCase = new DeleteUserUseCase(userRepository);
 // Auth use cases
 const registerUseCase = new RegisterUseCase(addUserUseCase, jsonWebToken);
 const loginUseCase = new LoginUseCase(userRepository, passwordHasher, jsonWebToken);
+const checkAuthUseCase = new CheckAuthUseCase(jsonWebToken, userRepository);
 
-// User controllers
-const addUserController = new AddUserController(addUserUseCase);
-const getAllUsersController = new GetAllUsersController(getAllUsersUseCase);
-const getUserByIdController = new GetUserByIdController(getUserByIdUseCase);
-const updateUserController = new UpdateUserController(updateUserUseCase);
-const deleteUserController = new DeleteUserController(deleteUserUseCase);
-
-// Auth controllers
-const registerController = new RegisterController(registerUseCase);
-const loginController = new LoginController(loginUseCase);
-
-// Export user controllers instances
 export {
-  addUserController,
-  getAllUsersController,
-  getUserByIdController,
-  updateUserController,
-  deleteUserController,
+  addUserUseCase,
+  getAllUsersUseCase,
+  getUserByIdUseCase,
+  updateUserUseCase,
+  deleteUserUseCase,
+  registerUseCase,
+  loginUseCase,
+  checkAuthUseCase,
 };
-
-// Export auth controllers instances
-export { registerController, loginController };

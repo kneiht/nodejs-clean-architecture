@@ -165,6 +165,7 @@
             <h2>Access Token</h2>
             <textarea id="access-token" rows="5"></textarea>
             <button id="copy-token-btn">Copy to User Management</button>
+            <button id="check-token-btn" style="margin-top: 5px;">Check Token</button>
           </div>
         </div>
         <div>
@@ -318,6 +319,28 @@
         const copyTokenBtn = document.getElementById('copy-token-btn');
         copyTokenBtn.addEventListener('click', () => {
           userMgmtTokenElement.value = accessTokenElement.value;
+        });
+
+        // --- Check Token ---
+        const checkTokenBtn = document.getElementById('check-token-btn');
+        checkTokenBtn.addEventListener('click', async () => {
+          const token = accessTokenElement.value;
+          if (!token) {
+            displayResponse(authResponseData, { error: 'Access token is empty.' });
+            return;
+          }
+
+          const url = `${API_URL}/users`; // A protected endpoint
+          const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+          displayRequest(authRequestData, 'GET', url, headers);
+
+          try {
+            const response = await fetch(url, { headers });
+            const data = await response.json();
+            displayResponse(authResponseData, data);
+          } catch (error) {
+            displayResponse(authResponseData, { error: error.message });
+          }
         });
 
         const getAuthHeaders = () => {
