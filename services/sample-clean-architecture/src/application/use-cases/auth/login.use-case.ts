@@ -1,15 +1,18 @@
 import { IJsonWebToken, ExpiresIn } from '@/application/dependency-interfaces/utils/jwt.js';
 import { IUserRepository } from '@/application/dependency-interfaces/repositories/user.repository.js';
 import { IPasswordHasher } from '@/application/dependency-interfaces/utils/password.js';
-import { IUseCase } from '@/application/use-cases/use-case.interface.js';
+import { IUseCase } from '@/application/use-cases/index.js';
 import { User } from '@/entities/user.entity.js';
+import { failureInternal, failureUnauthorized, successOk, UseCaseReponse } from '../response.js';
 
+// Define input
 export type LoginUseCaseInput = {
   email: string;
   password: string;
 };
 
-export type LoginUseCaseOutput = {
+// Define data for the response
+export type LoginUseCaseData = {
   user: User;
   token: {
     accessToken: string;
@@ -17,43 +20,52 @@ export type LoginUseCaseOutput = {
   };
 };
 
-export class LoginUseCase implements IUseCase<LoginUseCaseInput, LoginUseCaseOutput> {
+// Define the use case
+export class LoginUseCase implements IUseCase<LoginUseCaseInput, LoginUseCaseData> {
+  // Inject dependencies
   constructor(
     private userRepository: IUserRepository,
     private passwordHasher: IPasswordHasher,
     private jsonWebToken: IJsonWebToken,
   ) {}
 
-  async execute(input: LoginUseCaseInput): Promise<LoginUseCaseOutput> {
-    const user = await this.userRepository.findByEmail(input.email);
-    if (!user) {
-      throw new Error('Invalid email or password');
+  // Execute the use case
+  async execute(input: LoginUseCaseInput): Promise<UseCaseReponse<LoginUseCaseData>> {
+    // Catch any errors
+    try {
+      // Find user by email
+      const user = await this.userRepository.findByEmail(input.email);
+      if (!user) {
+        return failureUnauthorized('Invalid email or password');
+      }
+
+      // Verify password
+      const isPasswordValid = await this.passwordHasher.verify(
+        input.password,
+        user.getPasswordHash(),
+      );
+      if (!isPasswordValid) {
+        return failureUnauthorized('Invalid email or password');
+      }
+
+      // Create JWT payload
+      const payload = { id: user.id, email: user.email, name: user.name };
+
+      // Sign tokens
+      const accessToken = await this.jsonWebToken.sign(payload, ExpiresIn.ONE_HOUR);
+      const refreshToken = await this.jsonWebToken.sign(payload, ExpiresIn.SEVEN_DAYS);
+
+      // Return success response with user and tokens
+      return successOk({
+        user,
+        token: {
+          accessToken,
+          refreshToken,
+        },
+      });
+    } catch (error) {
+      // Handle other errors
+      return failureInternal('An unexpected error occurred during login.');
     }
-
-    const isPasswordValid = await this.passwordHasher.verify(
-      input.password,
-      user.getPasswordHash(),
-    );
-
-    if (!isPasswordValid) {
-      throw new Error('Invalid email or password');
-    }
-
-    const accessToken = await this.jsonWebToken.sign(
-      { id: user.id, email: user.email, name: user.name },
-      ExpiresIn.ONE_HOUR,
-    );
-    const refreshToken = await this.jsonWebToken.sign(
-      { id: user.id, email: user.email, name: user.name },
-      ExpiresIn.SEVEN_DAYS,
-    );
-
-    return {
-      user,
-      token: {
-        accessToken,
-        refreshToken,
-      },
-    };
   }
 }

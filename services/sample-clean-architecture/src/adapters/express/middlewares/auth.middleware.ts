@@ -1,13 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { sendUnauthorized } from '../utils/response.js';
 import { CheckAuthUseCase } from '@/application/use-cases/auth/check-auth.use-case.js';
-import { User } from '@/entities/user.entity.js';
+import { statusCodeConverter } from '../controller.js';
 
-interface RequestWithUser extends Request {
-  user?: User;
-}
-
-function extractTokenFromRequest(req: RequestWithUser): string | undefined {
+function extractTokenFromRequest(req: Request): string | undefined {
   const authHeader = req.headers.authorization;
   if (!authHeader) return undefined;
 
@@ -17,20 +12,27 @@ function extractTokenFromRequest(req: RequestWithUser): string | undefined {
   }
 }
 
+// Define the middleware factory
 export function makeCheckAuthMiddleware(checkAuthUseCase: CheckAuthUseCase) {
-  return async (req: RequestWithUser, res: Response, next: NextFunction) => {
-    const token = extractTokenFromRequest(req);
-
-    if (!token) {
-      return sendUnauthorized(res, 'Access token is missing');
-    }
-
+  // Return the middleware
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = await checkAuthUseCase.execute(token);
-      req.user = user;
+      // Extract the token from the request
+      const token = extractTokenFromRequest(req);
+
+      // Get the user from the use case
+      const output = await checkAuthUseCase.execute(token);
+
+      // If the user is found, set it to the request and continue
+      if (output.success) {
+        req.user = output.data;
+        next();
+      } else {
+        return res.status(statusCodeConverter(output.type)).json(output);
+      }
       next();
     } catch (error) {
-      return sendUnauthorized(res);
+      return res.status(500).json({ success: false, message: error });
     }
   };
 }

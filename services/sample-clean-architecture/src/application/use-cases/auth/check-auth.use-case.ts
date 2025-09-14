@@ -1,33 +1,48 @@
 import { IJsonWebToken } from '@/application/dependency-interfaces/utils/jwt.js';
 import { IUserRepository } from '@/application/dependency-interfaces/repositories/user.repository.js';
-import { IUseCase } from '@/application/use-cases/use-case.interface.js';
+import { IUseCase } from '@/application/use-cases/index.js';
 import { User } from '@/entities/user.entity.js';
+import { failureUnauthorized, successOk, UseCaseReponse } from '../response.js';
 
-export type CheckAuthUseCaseInput = string;
+// Define input
+export type CheckAuthUseCaseInput = string | undefined;
 
-export type CheckAuthUseCaseOutput = User;
+// Define data for the response
+export type CheckAuthUseCaseData = User;
 
-export class CheckAuthUseCase implements IUseCase<CheckAuthUseCaseInput, CheckAuthUseCaseOutput> {
+// Define the use case
+export class CheckAuthUseCase implements IUseCase<CheckAuthUseCaseInput, CheckAuthUseCaseData> {
+  // Inject dependencies
   constructor(
     private jsonWebToken: IJsonWebToken,
     private userRepository: IUserRepository,
   ) {}
 
-  async execute(token: CheckAuthUseCaseInput): Promise<CheckAuthUseCaseOutput> {
+  // Execute the use case
+  async execute(token: CheckAuthUseCaseInput): Promise<UseCaseReponse<CheckAuthUseCaseData>> {
+    // Catch any errors
     try {
+      // Check if the token is provided
+      if (!token) {
+        return failureUnauthorized('Access token is missing');
+      }
+
+      // Verify the token
       const payload = await this.jsonWebToken.verify(token);
       if (!payload) {
-        throw new Error('Invalid token payload');
+        return failureUnauthorized('Invalid token payload');
       }
 
+      // Find the user by ID
       const user = await this.userRepository.findById(payload.id);
       if (!user) {
-        throw new Error('User not found');
+        return failureUnauthorized('User not found');
       }
 
-      return user;
+      // Return the user
+      return successOk(user);
     } catch (error) {
-      throw new Error('Authentication failed');
+      return failureUnauthorized('Authentication failed');
     }
   }
 }

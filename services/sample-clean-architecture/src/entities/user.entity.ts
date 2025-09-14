@@ -1,5 +1,6 @@
 import { uuidv7 } from 'uuidv7';
 import z from 'zod';
+import { EntityValidationError } from './entity.error.js';
 
 // Define userSchema
 const userSchema = z.object({
@@ -43,7 +44,7 @@ export class User {
   validate(): void {
     const result = userSchema.safeParse(this);
     if (!result.success) {
-      throw new Error(result.error.issues.map((iss) => iss.message).join(', '));
+      throw new EntityValidationError(result.error.issues.map((iss) => iss.message).join(', '));
     }
   }
 

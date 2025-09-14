@@ -1,11 +1,8 @@
-import { IUseCase } from '@/application/use-cases/use-case.interface.js';
+import { IUseCase } from '@/application/use-cases/index.js';
+import { ErrorType, SuccessType } from '@/application/use-cases/response.js';
 import { Request, Response, NextFunction } from 'express';
 
-export interface AdvancedRequest extends Request {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  locals: any;
-}
-
+// Extract request data
 export function extractor(req: Request) {
   const params = req.params;
   const query = req.query;
@@ -25,40 +22,40 @@ export function extractor(req: Request) {
     }
   }
 
-  return { ...params, ...query, ...body, token };
+  // Return the request data in a single object to be used by the use case
+  return { ...body, ...query, ...params, token };
 }
 
-export function basicController<UseCaseInput, UseCaseOutput>(
-  useCase: IUseCase<UseCaseInput, UseCaseOutput>,
+// Status code converter
+export function statusCodeConverter(useCaseResponseType: ErrorType | SuccessType | undefined) {
+  switch (useCaseResponseType) {
+    case ErrorType.VALIDATION:
+      return 400;
+    case ErrorType.NOT_FOUND:
+      return 404;
+    case ErrorType.UNAUTHORIZED:
+      return 401;
+    case ErrorType.FORBIDDEN:
+      return 403;
+    case ErrorType.INTERNAL:
+      return 500;
+    default:
+      return 200;
+  }
+}
+
+// Define a basic controller for use cases
+export function basicController<UseCaseInput, UseCaseData>(
+  useCase: IUseCase<UseCaseInput, UseCaseData>,
 ) {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const input = extractor(req);
+  return async (req: Request, res: Response) => {
     try {
+      const input = extractor(req);
       const output = await useCase.execute(input);
-      req.locals = output;
-      return res.status(200).json(output);
+      res.status(statusCodeConverter(output.type)).json(output);
     } catch (error) {
-      next(error);
+      const errorMessage = error instanceof Error ? error.message : error;
+      res.status(500).json({ success: false, message: errorMessage });
     }
   };
 }
-
-// export function authCheckController<UseCaseInput, UseCaseOutput>(
-//   useCase: IUseCase<UseCaseInput, UseCaseOutput>,
-// ) {
-//   return async (req: Request, res: Response) => {
-//     const authHeader = req.headers.authorization;
-//     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-//       return sendUnauthorized(res, 'Token not provided');
-//     }
-
-//     const token = authHeader.split(' ')[1];
-//     const user = await useCase.execute(token);
-
-//     if (!user) {
-//       return sendUnauthorized(res, 'Invalid token');
-//     }
-
-//     return sendSuccess(res, user);
-//   };
-// }

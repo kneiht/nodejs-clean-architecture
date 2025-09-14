@@ -1,15 +1,22 @@
 import { ExpiresIn, IJsonWebToken } from '@/application/dependency-interfaces/utils/jwt.js';
 import { User } from '@/entities/user.entity.js';
-import { IUseCase } from '../use-case.interface.js';
+import { IUseCase } from '../index.js';
 import { AddUserUseCase } from '../user/add-user.use-case.js';
+import {
+  failureInternal,
+  successCreated,
+  UseCaseReponse,
+} from '@/application/use-cases/response.js';
 
+// Define input
 export type RegisterUseCaseInput = {
   email: string;
   name: string;
   password: string;
 };
 
-export type RegisterUseCaseOutput = {
+// Define data for the response
+export type RegisterUseCaseData = {
   user: User;
   token: {
     accessToken: string;
@@ -17,28 +24,45 @@ export type RegisterUseCaseOutput = {
   };
 };
 
-export class RegisterUseCase implements IUseCase<RegisterUseCaseInput, RegisterUseCaseOutput> {
+// Define the use case
+export class RegisterUseCase implements IUseCase<RegisterUseCaseInput, RegisterUseCaseData> {
+  // Inject dependencies
   constructor(
     private addUserUseCase: AddUserUseCase,
     private jsonWebToken: IJsonWebToken,
   ) {}
-  async execute(input: RegisterUseCaseInput): Promise<RegisterUseCaseOutput> {
-    const user = await this.addUserUseCase.execute(input);
-    const accessToken = await this.jsonWebToken.sign(
-      { id: user.id, email: user.email, name: user.name },
-      ExpiresIn.ONE_HOUR,
-    );
-    const refreshToken = await this.jsonWebToken.sign(
-      { id: user.id, email: user.email, name: user.name },
-      ExpiresIn.SEVEN_DAYS,
-    );
+  // Execute the use case
+  async execute(input: RegisterUseCaseInput): Promise<UseCaseReponse<RegisterUseCaseData>> {
+    // Catch any errors
+    try {
+      // Use AddUserUseCase to create the user
+      const addUserResponse = await this.addUserUseCase.execute(input);
 
-    return {
-      user,
-      token: {
-        accessToken,
-        refreshToken,
-      },
-    };
+      // If user creation failed
+      if (!addUserResponse.success || !addUserResponse.data) {
+        const registerResponse = { data: undefined, ...addUserResponse };
+        return registerResponse as UseCaseReponse<RegisterUseCaseData>;
+      }
+
+      // If successful, create tokens
+      const user = addUserResponse.data;
+      const payload = { id: user.id, email: user.email, name: user.name };
+
+      // Sign tokens
+      const accessToken = await this.jsonWebToken.sign(payload, ExpiresIn.ONE_HOUR);
+      const refreshToken = await this.jsonWebToken.sign(payload, ExpiresIn.SEVEN_DAYS);
+
+      // Return success response with user and tokens
+      return successCreated({
+        user,
+        token: {
+          accessToken,
+          refreshToken,
+        },
+      });
+    } catch (error) {
+      // Handle other errors
+      return failureInternal('An unexpected error occurred during registration.');
+    }
   }
 }
