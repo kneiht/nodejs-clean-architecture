@@ -36,9 +36,8 @@ export class User {
     this.validate();
   }
 
-  comparePassword(password: string) {
-    // TODO: use bcryptjs
-    return password === this.passwordHash;
+  getPasswordHash(): string {
+    return this.passwordHash;
   }
 
   validate(): void {

@@ -1,190 +1,425 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User API Test Page</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 2em; background-color: #f4f4f9; color: #333; }
-    h1, h2 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
-    .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2em; }
-    .card { background-color: #fff; border: 1px solid #ddd; padding: 1.5em; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    button { padding: 0.6em 1.2em; border: none; background-color: #007bff; color: white; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
-    button:hover { background-color: #0056b3; }
-    button.danger { background-color: #dc3545; }
-    button.danger:hover { background-color: #c82333; }
-    input { width: calc(100% - 1.2em); padding: 0.6em; margin-bottom: 0.5em; border: 1px solid #ccc; border-radius: 5px; }
-    pre { background-color: #2d2d2d; color: #f1f1f1; padding: 1em; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; font-family: 'Fira Code', 'Courier New', Courier, monospace; }
-    form { display: flex; flex-direction: column; }
-  </style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Test Page</title>
+    <style>
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #f0f0f0;
+        --primary-color: #007bff;
+        --primary-hover-color: #0056b3;
+        --danger-color: #dc3545;
+        --danger-hover-color: #c82333;
+        --card-bg-color: #2a2a2a;
+        --input-bg-color: #3a3a3a;
+        --input-border-color: #555;
+        --pre-bg-color: #111;
+        --tab-bg-color: #2a2a2a;
+        --tab-active-bg-color: #3a3a3a;
+      }
 
-  <h1>User API Test Page</h1>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        margin: 2em;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+      }
 
-  <div class="container">
-    <!-- Get All Users -->
-    <div class="card">
-      <h2>Get All Users</h2>
-      <button id="get-users-btn">Fetch All Users</button>
-      <h3>Result:</h3>
-      <pre id="get-users-result">Click the button to see all users.</pre>
+      .tabs {
+        display: flex;
+        border-bottom: 2px solid var(--primary-color);
+      }
+
+      .tab-button {
+        padding: 10px 20px;
+        cursor: pointer;
+        background-color: var(--tab-bg-color);
+        border: none;
+        color: var(--text-color);
+        font-size: 16px;
+        transition: background-color 0.2s;
+      }
+
+      .tab-button:hover {
+        background-color: var(--tab-active-bg-color);
+      }
+
+      .tab-button.active {
+        background-color: var(--primary-color);
+      }
+
+      .tab-content {
+        display: none;
+        padding: 20px 0;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .content-grid {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2em;
+      }
+
+      .card {
+        background-color: var(--card-bg-color);
+        border: 1px solid var(--input-border-color);
+        padding: 1.5em;
+        border-radius: 8px;
+        margin-bottom: 1em;
+        overflow: auto;
+      }
+
+      button {
+        padding: 0.6em 1.2em;
+        border: none;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-top: 10px;
+      }
+
+      button:hover {
+        background-color: var(--primary-hover-color);
+      }
+
+      button.danger {
+        background-color: var(--danger-color);
+      }
+
+      button.danger:hover {
+        background-color: var(--danger-hover-color);
+      }
+
+      input,
+      textarea {
+        width: calc(100% - 1.2em);
+        padding: 0.6em;
+        margin-bottom: 0.5em;
+        border: 1px solid var(--input-border-color);
+        background-color: var(--input-bg-color);
+        color: var(--text-color);
+        border-radius: 5px;
+      }
+
+      .content-grid > div {
+        min-width: 0;
+      }
+
+      pre {
+        background-color: var(--pre-bg-color);
+        color: #f1f1f1;
+        padding: 1em;
+        border-radius: 5px;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        font-family: 'Fira Code', 'Courier New', Courier, monospace;
+        min-height: 50px;
+        max-height: 300px;
+        overflow: auto;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tabs">
+      <button class="tab-button active" onclick="openTab(event, 'auth')">Auth</button>
+      <button class="tab-button" onclick="openTab(event, 'user-management')">
+        User Management
+      </button>
     </div>
 
-    <!-- Create User -->
-    <div class="card">
-      <h2>Create User</h2>
-      <form id="create-user-form">
-        <input type="text" id="create-name" placeholder="Name" required>
-        <input type="email" id="create-email" placeholder="Email" required>
-        <input type="password" id="create-password" placeholder="Password (min 8 chars)" required>
-        <button type="submit">Create User</button>
-      </form>
-      <h3>Result:</h3>
-      <pre id="create-user-result"></pre>
+    <div id="auth" class="tab-content active">
+      <div class="content-grid">
+        <div>
+          <div class="card">
+            <h2>Register User</h2>
+            <form id="register-form">
+              <input type="text" id="register-name" placeholder="Name" required />
+              <input type="email" id="register-email" placeholder="Email" required />
+              <input type="password" id="register-password" placeholder="Password" required />
+              <button type="submit">Register</button>
+            </form>
+          </div>
+          <div class="card">
+            <h2>Login User</h2>
+            <form id="login-form">
+              <input type="email" id="login-email" placeholder="Email" required />
+              <input type="password" id="login-password" placeholder="Password" required />
+              <button type="submit">Login</button>
+            </form>
+          </div>
+          <div class="card">
+            <h2>Access Token</h2>
+            <textarea id="access-token" rows="5"></textarea>
+            <button id="copy-token-btn">Copy to User Management</button>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h2>Request Data</h2>
+            <pre id="auth-request-data"></pre>
+            <h2>Response Data</h2>
+            <pre id="auth-response-data"></pre>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Get User by ID -->
-    <div class="card">
-      <h2>Get/Delete by ID</h2>
-      <form id="get-delete-user-form">
-        <input type="text" id="user-id" placeholder="User ID" required>
-        <button type="button" id="get-user-by-id-btn">Get User</button>
-        <button type="button" id="delete-user-btn" class="danger" style="margin-top: 5px;">Delete User</button>
-      </form>
-      <h3>Result:</h3>
-      <pre id="get-delete-user-result"></pre>
+    <div id="user-management" class="tab-content">
+      <div class="content-grid">
+        <div>
+          <div class="card">
+            <h2>Authorization</h2>
+            <textarea
+              id="user-mgmt-token"
+              placeholder="Login to get a token and copy it here"
+              rows="5"
+            ></textarea>
+          </div>
+          <div class="card">
+            <h2>Get All Users</h2>
+            <button id="get-users-btn">Fetch All Users</button>
+          </div>
+          <div class="card">
+            <h2>Get/Delete by ID</h2>
+            <form id="get-delete-user-form">
+              <input type="text" id="user-id" placeholder="User ID" required />
+              <button type="button" id="get-user-by-id-btn">Get User</button>
+              <button type="button" id="delete-user-btn" class="danger" style="margin-top: 5px">
+                Delete User
+              </button>
+            </form>
+          </div>
+          <div class="card">
+            <h2>Update User</h2>
+            <form id="update-user-form">
+              <input type="text" id="update-id" placeholder="User ID to Update" required />
+              <input type="text" id="update-name" placeholder="New Name (optional)" />
+              <input type="email" id="update-email" placeholder="New Email (optional)" />
+              <button type="submit">Update User</button>
+            </form>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h2>Request Data</h2>
+            <pre id="user-request-data"></pre>
+            <h2>Response Data</h2>
+            <pre id="user-response-data"></pre>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Update User -->
-    <div class="card">
-      <h2>Update User</h2>
-      <form id="update-user-form">
-        <input type="text" id="update-id" placeholder="User ID to Update" required>
-        <input type="text" id="update-name" placeholder="New Name (optional)">
-        <input type="email" id="update-email" placeholder="New Email (optional)">
-        <button type="submit">Update User</button>
-      </form>
-      <h3>Result:</h3>
-      <pre id="update-user-result"></pre>
-    </div>
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const API_URL = 'http://localhost:3000';
-
-      const displayResult = (element, data) => {
-        if (typeof data === 'string') {
-          element.textContent = data;
-          return;
+    <script>
+      function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName('tab-content');
+        for (i = 0; i < tabcontent.length; i++) {
+          tabcontent[i].style.display = 'none';
         }
-        element.textContent = JSON.stringify(data, null, 2);
-      };
-
-      // --- Get All Users ---
-      const getUsersBtn = document.getElementById('get-users-btn');
-      const getUsersResult = document.getElementById('get-users-result');
-      const fetchAllUsers = async () => {
-        try {
-          getUsersResult.textContent = 'Loading...';
-          const response = await fetch(`${API_URL}/users`);
-          const data = await response.json();
-          displayResult(getUsersResult, data);
-        } catch (error) {
-          displayResult(getUsersResult, `Error: ${error.message}`);
+        tablinks = document.getElementsByClassName('tab-button');
+        for (i = 0; i < tablinks.length; i++) {
+          tablinks[i].className = tablinks[i].className.replace(' active', '');
         }
-      };
-      getUsersBtn.addEventListener('click', fetchAllUsers);
+        document.getElementById(tabName).style.display = 'block';
+        evt.currentTarget.className += ' active';
+      }
 
-      // --- Create User ---
-      const createUserForm = document.getElementById('create-user-form');
-      const createUserResult = document.getElementById('create-user-result');
-      createUserForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const name = document.getElementById('create-name').value;
-        const email = document.getElementById('create-email').value;
-        const password = document.getElementById('create-password').value;
-        try {
-          const response = await fetch(`${API_URL}/users`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password }),
-          });
-          const data = await response.json();
-          displayResult(createUserResult, data);
-          if(response.ok) fetchAllUsers(); // Refresh user list
-        } catch (error) {
-          displayResult(createUserResult, `Error: ${error.message}`);
-        }
+      document.addEventListener('DOMContentLoaded', () => {
+        const API_URL = 'http://localhost:3000';
+        let accessToken = '';
+
+        const authRequestData = document.getElementById('auth-request-data');
+        const authResponseData = document.getElementById('auth-response-data');
+        const userRequestData = document.getElementById('user-request-data');
+        const userResponseData = document.getElementById('user-response-data');
+        const accessTokenElement = document.getElementById('access-token');
+        const userMgmtTokenElement = document.getElementById('user-mgmt-token');
+
+        const displayRequest = (element, method, url, headers, body) => {
+          let reqString = `Method: ${method}\nURL: ${url}`;
+          if (headers) {
+            reqString += `\nHeaders: ${JSON.stringify(headers, null, 2)}`;
+          }
+          if (body) {
+            reqString += `\nBody: ${JSON.stringify(body, null, 2)}`;
+          }
+          element.textContent = reqString;
+        };
+
+        const displayResponse = (element, data) => {
+          element.textContent = JSON.stringify(data, null, 2);
+        };
+
+        // --- Register User ---
+        const registerForm = document.getElementById('register-form');
+        registerForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const name = document.getElementById('register-name').value;
+          const email = document.getElementById('register-email').value;
+          const password = document.getElementById('register-password').value;
+          const body = { name, email, password };
+          const url = `${API_URL}/auth/register`;
+          displayRequest(authRequestData, 'POST', url, null, body);
+          try {
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+            });
+            const data = await response.json();
+            displayResponse(authResponseData, data);
+          } catch (error) {
+            displayResponse(authResponseData, { error: error.message });
+          }
+        });
+
+        // --- Login User ---
+        const loginForm = document.getElementById('login-form');
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const email = document.getElementById('login-email').value;
+          const password = document.getElementById('login-password').value;
+          const body = { email, password };
+          const url = `${API_URL}/auth/login`;
+          displayRequest(authRequestData, 'POST', url, null, body);
+          try {
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+            });
+            const data = await response.json();
+            displayResponse(authResponseData, data);
+            if (response.ok && data.token) {
+              accessToken = data.token.accessToken;
+              accessTokenElement.value = accessToken;
+            }
+          } catch (error) {
+            displayResponse(authResponseData, { error: error.message });
+          }
+        });
+
+        // --- Copy Token ---
+        const copyTokenBtn = document.getElementById('copy-token-btn');
+        copyTokenBtn.addEventListener('click', () => {
+          userMgmtTokenElement.value = accessTokenElement.value;
+        });
+
+        const getAuthHeaders = () => {
+          const token = userMgmtTokenElement.value;
+          if (!token) return { 'Content-Type': 'application/json' };
+          return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+        };
+
+        // --- Get All Users ---
+        const getUsersBtn = document.getElementById('get-users-btn');
+        getUsersBtn.addEventListener('click', async () => {
+          const url = `${API_URL}/users`;
+          const headers = getAuthHeaders();
+          displayRequest(userRequestData, 'GET', url, headers);
+          try {
+            userResponseData.textContent = 'Loading...';
+            const response = await fetch(url, { headers });
+            const data = await response.json();
+            displayResponse(userResponseData, data);
+          } catch (error) {
+            displayResponse(userResponseData, { error: error.message });
+          }
+        });
+
+        // --- Get User by ID ---
+        const getUserByIdBtn = document.getElementById('get-user-by-id-btn');
+        getUserByIdBtn.addEventListener('click', async () => {
+          const id = document.getElementById('user-id').value;
+          if (!id) {
+            displayResponse(userResponseData, { error: 'Please enter a User ID.' });
+            return;
+          }
+          const url = `${API_URL}/users/${id}`;
+          const headers = getAuthHeaders();
+          displayRequest(userRequestData, 'GET', url, headers);
+          try {
+            const response = await fetch(url, { headers });
+            const data = await response.json();
+            displayResponse(userResponseData, data);
+          } catch (error) {
+            displayResponse(userResponseData, { error: error.message });
+          }
+        });
+
+        // --- Delete User ---
+        const deleteUserBtn = document.getElementById('delete-user-btn');
+        deleteUserBtn.addEventListener('click', async () => {
+          const id = document.getElementById('user-id').value;
+          if (!id) {
+            displayResponse(userResponseData, { error: 'Please enter a User ID.' });
+            return;
+          }
+          if (!confirm(`Are you sure you want to delete user ${id}?`)) return;
+          const url = `${API_URL}/users/${id}`;
+          const headers = getAuthHeaders();
+          displayRequest(userRequestData, 'DELETE', url, headers);
+          try {
+            const response = await fetch(url, { method: 'DELETE', headers });
+            displayResponse(userResponseData, {
+              status: response.status,
+              statusText: response.statusText,
+            });
+          } catch (error) {
+            displayResponse(userResponseData, { error: error.message });
+          }
+        });
+
+        // --- Update User ---
+        const updateUserForm = document.getElementById('update-user-form');
+        updateUserForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const id = document.getElementById('update-id').value;
+          const name = document.getElementById('update-name').value;
+          const email = document.getElementById('update-email').value;
+
+          const body = {};
+          if (name) body.name = name;
+          if (email) body.email = email;
+
+          if (Object.keys(body).length === 0) {
+            displayResponse(userResponseData, {
+              error: 'Please provide a new name or email to update.',
+            });
+            return;
+          }
+          const url = `${API_URL}/users/${id}`;
+          const headers = getAuthHeaders();
+          displayRequest(userRequestData, 'PATCH', url, headers, body);
+
+          try {
+            const response = await fetch(url, {
+              method: 'PATCH',
+              headers,
+              body: JSON.stringify(body),
+            });
+            const data = await response.json();
+            displayResponse(userResponseData, data);
+          } catch (error) {
+            displayResponse(userResponseData, { error: error.message });
+          }
+        });
       });
-
-      // --- Get User by ID ---
-      const getUserByIdBtn = document.getElementById('get-user-by-id-btn');
-      const getDeleteUserResult = document.getElementById('get-delete-user-result');
-      getUserByIdBtn.addEventListener('click', async () => {
-        const id = document.getElementById('user-id').value;
-        if (!id) { displayResult(getDeleteUserResult, 'Please enter a User ID.'); return; }
-        try {
-          const response = await fetch(`${API_URL}/users/${id}`);
-          const data = await response.json();
-          displayResult(getDeleteUserResult, data);
-        } catch (error) {
-          displayResult(getDeleteUserResult, `Error: ${error.message}`);
-        }
-      });
-
-      // --- Delete User ---
-      const deleteUserBtn = document.getElementById('delete-user-btn');
-      deleteUserBtn.addEventListener('click', async () => {
-        const id = document.getElementById('user-id').value;
-        if (!id) { displayResult(getDeleteUserResult, 'Please enter a User ID.'); return; }
-        if (!confirm(`Are you sure you want to delete user ${id}?`)) return;
-        try {
-          const response = await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' });
-          displayResult(getDeleteUserResult, `Status: ${response.status} ${response.statusText}`);
-          if(response.ok) fetchAllUsers(); // Refresh user list
-        } catch (error) {
-          displayResult(getDeleteUserResult, `Error: ${error.message}`);
-        }
-      });
-
-      // --- Update User ---
-      const updateUserForm = document.getElementById('update-user-form');
-      const updateUserResult = document.getElementById('update-user-result');
-      updateUserForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('update-id').value;
-        const name = document.getElementById('update-name').value;
-        const email = document.getElementById('update-email').value;
-        
-        const body = {};
-        if (name) body.name = name;
-        if (email) body.email = email;
-
-        if (Object.keys(body).length === 0) {
-          displayResult(updateUserResult, 'Please provide a new name or email to update.');
-          return;
-        }
-
-        try {
-          const response = await fetch(`${API_URL}/users/${id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-          });
-          const data = await response.json();
-          displayResult(updateUserResult, data);
-          if(response.ok) fetchAllUsers(); // Refresh user list
-        } catch (error) {
-          displayResult(updateUserResult, `Error: ${error.message}`);
-        }
-      });
-
-      // Initial fetch
-      fetchAllUsers();
-    });
-  </script>
-
-</body>
+    </script>
+  </body>
 </html>
