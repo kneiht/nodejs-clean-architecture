@@ -1,5 +1,6 @@
 import { uuidv7 } from 'uuidv7';
 import z from 'zod';
+import { EntityValidationError } from './entity.error.js';
 
 // Define postSchema
 const postSchema = z.object({
@@ -11,21 +12,24 @@ const postSchema = z.object({
   updatedAt: z.date(),
 });
 
+// Define props for creation, omitting auto-generated fields
+type PostProps = Omit<z.infer<typeof postSchema>, 'id' | 'createdAt' | 'updatedAt'>;
+
 // Define Post class
 export class Post {
   public readonly id: string;
   public title: string;
   public content: string;
+  public readonly userId: string;
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  constructor(
-    props: Omit<z.infer<typeof postSchema>, 'id' | 'createdAt' | 'updatedAt'>,
-    id?: string,
-  ) {
+  constructor(props: PostProps, id?: string) {
     this.id = id ?? uuidv7();
     this.title = props.title;
     this.content = props.content;
+    this.userId = props.userId;
+
     const now = new Date();
     this.createdAt = now;
     this.updatedAt = now;
@@ -37,7 +41,7 @@ export class Post {
   validate(): void {
     const result = postSchema.safeParse(this);
     if (!result.success) {
-      throw new Error(result.error.issues.map((iss) => iss.message).join(', '));
+      throw new EntityValidationError(result.error.issues.map((iss) => iss.message).join(', '));
     }
   }
 
@@ -46,6 +50,7 @@ export class Post {
       id: this.id,
       title: this.title,
       content: this.content,
+      userId: this.userId,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
