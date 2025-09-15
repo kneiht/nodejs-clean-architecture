@@ -3,622 +3,584 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>API Test Page</title>
+    <title>Sample Clean Architecture App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
       :root {
-        --bg-color: #1a1a1a;
-        --text-color: #f0f0f0;
-        --primary-color: #007bff;
-        --primary-hover-color: #0056b3;
-        --danger-color: #dc3545;
-        --danger-hover-color: #c82333;
-        --card-bg-color: #2a2a2a;
-        --input-bg-color: #3a3a3a;
-        --input-border-color: #555;
-        --pre-bg-color: #111;
-        --tab-bg-color: #2a2a2a;
-        --tab-active-bg-color: #3a3a3a;
+        --scroll-track: #0f172a; /* slate-900 */
+        --scroll-thumb: #334155; /* slate-700 */
+        --scroll-thumb-hover: #475569; /* slate-600 */
+        --scroll-corner: #0b1228; /* near code bg */
       }
-
-      body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        margin: 2em;
-        background-color: var(--bg-color);
-        color: var(--text-color);
+      /* Firefox */
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--scroll-thumb) var(--scroll-track);
       }
-
-      .tabs {
-        display: flex;
-        border-bottom: 2px solid var(--primary-color);
+      /* WebKit */
+      *::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
       }
-
-      .tab-button {
-        padding: 10px 20px;
-        cursor: pointer;
-        background-color: var(--tab-bg-color);
-        border: none;
-        color: var(--text-color);
-        font-size: 16px;
-        transition: background-color 0.2s;
+      *::-webkit-scrollbar-track {
+        background: var(--scroll-track);
+        border-radius: 9999px;
       }
-
-      .tab-button:hover {
-        background-color: var(--tab-active-bg-color);
+      *::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, rgba(51, 65, 85, 0.95), rgba(30, 41, 59, 0.95));
+        border: 2px solid var(--scroll-track);
+        border-radius: 9999px;
       }
-
-      .tab-button.active {
-        background-color: var(--primary-color);
+      *::-webkit-scrollbar-thumb:hover {
+        background: var(--scroll-thumb-hover);
       }
-
-      .tab-content {
-        display: none;
-        padding: 20px 0;
-      }
-
-      .tab-content.active {
-        display: block;
-      }
-
-      .content-grid {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2em;
-      }
-
-      .card {
-        background-color: var(--card-bg-color);
-        border: 1px solid var(--input-border-color);
-        padding: 1.5em;
-        border-radius: 8px;
-        margin-bottom: 1em;
-        overflow: auto;
-      }
-
-      button {
-        padding: 0.6em 1.2em;
-        border: none;
-        background-color: var(--primary-color);
-        color: white;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        margin-top: 10px;
-      }
-
-      button:hover {
-        background-color: var(--primary-hover-color);
-      }
-
-      button.danger {
-        background-color: var(--danger-color);
-      }
-
-      button.danger:hover {
-        background-color: var(--danger-hover-color);
-      }
-
-      input,
-      textarea {
-        width: calc(100% - 1.2em);
-        padding: 0.6em;
-        margin-bottom: 0.5em;
-        border: 1px solid var(--input-border-color);
-        background-color: var(--input-bg-color);
-        color: var(--text-color);
-        border-radius: 5px;
-      }
-
-      .content-grid > div {
-        min-width: 0;
-      }
-
-      pre {
-        background-color: var(--pre-bg-color);
-        color: #f1f1f1;
-        padding: 1em;
-        border-radius: 5px;
-        white-space: pre-wrap;
-        overflow-wrap: break-word;
-        font-family: 'Fira Code', 'Courier New', Courier, monospace;
-        min-height: 50px;
-        max-height: 300px;
-        overflow: auto;
-      }
-
-      form {
-        display: flex;
-        flex-direction: column;
+      *::-webkit-scrollbar-corner {
+        background: var(--scroll-corner);
       }
     </style>
   </head>
-  <body>
-    <div class="tabs">
-      <button class="tab-button active" onclick="openTab(event, 'auth')">Auth</button>
-      <button class="tab-button" onclick="openTab(event, 'user-management')">
-        User Management
-      </button>
-      <button class="tab-button" onclick="openTab(event, 'post-management')">
-        Post Management
-      </button>
-    </div>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <div class="max-w-6xl mx-auto p-6">
+      <!-- Header -->
+      <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="flex items-center gap-3">
+          <h1 class="text-xl font-semibold tracking-tight">Test APIs</h1>
+        </div>
+        <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto] w-full md:w-[640px] items-end">
+          <label class="text-xs text-slate-400">
+            <span class="block mb-1">Base URL</span>
+            <input
+              id="api-url"
+              value="http://localhost:3000"
+              class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+            />
+          </label>
+          <label class="text-xs text-slate-400">
+            <span class="block mb-1">Access Token</span>
+            <input
+              id="access-token"
+              placeholder="Login to obtain token"
+              class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+            />
+          </label>
+          <button
+            id="apply-url"
+            class="h-9 md:mt-0 inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 text-sm font-medium hover:bg-indigo-500"
+          >
+            Apply
+          </button>
+        </div>
+      </header>
 
-    <div id="auth" class="tab-content active">
-      <div class="content-grid">
-        <div>
-          <div class="card">
-            <h2>Register User</h2>
-            <form id="register-form">
-              <input type="text" id="register-name" placeholder="Name" required />
-              <input type="email" id="register-email" placeholder="Email" required />
-              <input type="password" id="register-password" placeholder="Password" required />
-              <button type="submit">Register</button>
-            </form>
-          </div>
-          <div class="card">
-            <h2>Login User</h2>
-            <form id="login-form">
-              <input type="email" id="login-email" placeholder="Email" required />
-              <input type="password" id="login-password" placeholder="Password" required />
-              <button type="submit">Login</button>
-            </form>
-          </div>
-          <div class="card">
-            <h2>Access Token</h2>
-            <textarea id="access-token" rows="5"></textarea>
-            <button id="copy-token-btn">Copy Token</button>
-            <button id="check-token-btn" style="margin-top: 5px;">Check Token</button>
-          </div>
-        </div>
-        <div>
-          <div class="card">
-            <h2>Request Data</h2>
-            <pre id="auth-request-data"></pre>
-            <h2>Response Data</h2>
-            <pre id="auth-response-data"></pre>
-          </div>
-        </div>
+      <!-- Tabs -->
+      <div class="mt-6 flex flex-wrap gap-2">
+        <button
+          class="tab-btn data-[active=true]:bg-indigo-600 data-[active=true]:text-white bg-slate-900/60 border border-slate-800 px-3 py-1.5 rounded-md text-sm"
+          data-tab="auth"
+          data-active="true"
+        >
+          Auth
+        </button>
+        <button
+          class="tab-btn data-[active=true]:bg-indigo-600 data-[active=true]:text-white bg-slate-900/60 border border-slate-800 px-3 py-1.5 rounded-md text-sm"
+          data-tab="users"
+        >
+          Users
+        </button>
+        <button
+          class="tab-btn data-[active=true]:bg-indigo-600 data-[active=true]:text-white bg-slate-900/60 border border-slate-800 px-3 py-1.5 rounded-md text-sm"
+          data-tab="posts"
+        >
+          Posts
+        </button>
       </div>
-    </div>
 
-    <div id="user-management" class="tab-content">
-      <div class="content-grid">
-        <div>
-          <div class="card">
-            <h2>Authorization</h2>
-            <textarea
-              id="user-mgmt-token"
-              placeholder="Login to get a token and copy it here"
-              rows="5"
-            ></textarea>
-          </div>
-          <div class="card">
-            <h2>Get All Users</h2>
-            <button id="get-users-btn">Fetch All Users</button>
-          </div>
-          <div class="card">
-            <h2>Get/Delete by ID</h2>
-            <form id="get-delete-user-form">
-              <input type="text" id="user-id" placeholder="User ID" required />
-              <button type="button" id="get-user-by-id-btn">Get User</button>
-              <button type="button" id="delete-user-btn" class="danger" style="margin-top: 5px">
-                Delete User
-              </button>
-            </form>
-          </div>
-          <div class="card">
-            <h2>Update User</h2>
-            <form id="update-user-form">
-              <input type="text" id="update-id" placeholder="User ID to Update" required />
-              <input type="text" id="update-name" placeholder="New Name (optional)" />
-              <input type="email" id="update-email" placeholder="New Email (optional)" />
-              <button type="submit">Update User</button>
-            </form>
-          </div>
-        </div>
-        <div>
-          <div class="card">
-            <h2>Request Data</h2>
-            <pre id="user-request-data"></pre>
-            <h2>Response Data</h2>
-            <pre id="user-response-data"></pre>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="post-management" class="tab-content">
-        <div class="content-grid">
-          <div>
-            <div class="card">
-              <h2>Authorization</h2>
-              <textarea
-                id="post-mgmt-token"
-                placeholder="Login to get a token and copy it here"
-                rows="5"
-              ></textarea>
-            </div>
-            <div class="card">
-              <h2>Get All Posts</h2>
-              <button id="get-posts-btn">Fetch All Posts</button>
-            </div>
-            <div class="card">
-              <h2>Create Post</h2>
-              <form id="create-post-form">
-                <input type="text" id="create-post-title" placeholder="Title" required />
-                <textarea id="create-post-content" placeholder="Content" required></textarea>
-                <button type="submit">Create Post</button>
-              </form>
-            </div>
-            <div class="card">
-              <h2>Get/Update/Delete by ID</h2>
-              <form id="gud-post-form">
-                <input type="text" id="post-id" placeholder="Post ID" required />
-                <input type="text" id="update-post-title" placeholder="New Title (for update)" />
-                <textarea id="update-post-content" placeholder="New Content (for update)"></textarea>
-                <button type="button" id="get-post-by-id-btn">Get Post</button>
-                <button type="button" id="update-post-btn" style="margin-top: 5px;">Update Post</button>
-                <button type="button" id="delete-post-btn" class="danger" style="margin-top: 5px">
-                  Delete Post
+      <!-- Auth Tab -->
+      <section id="tab-auth" class="mt-4 grid gap-4 md:grid-cols-2">
+        <div class="grid gap-4">
+          <!-- Register -->
+          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+            <h3 class="font-medium mb-3">Register</h3>
+            <div class="grid gap-3">
+              <div class="grid md:grid-cols-2 gap-3">
+                <label class="text-xs text-slate-400">
+                  <span class="block mb-1">Email</span>
+                  <input
+                    id="r-email"
+                    type="email"
+                    placeholder="user@example.com"
+                    class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  />
+                </label>
+                <label class="text-xs text-slate-400">
+                  <span class="block mb-1">Name</span>
+                  <input
+                    id="r-name"
+                    placeholder="Jane Doe"
+                    class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  />
+                </label>
+              </div>
+              <div class="grid md:grid-cols-[1fr_auto] gap-3 items-end">
+                <label class="text-xs text-slate-400">
+                  <span class="block mb-1">Password</span>
+                  <input
+                    id="r-pass"
+                    type="password"
+                    placeholder="******"
+                    class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  />
+                </label>
+                <button
+                  id="btn-register"
+                  class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500"
+                >
+                  Register
                 </button>
-              </form>
+              </div>
+              <p class="text-xs text-slate-400">POST /auth/register { email, name, password }</p>
             </div>
           </div>
-          <div>
-            <div class="card">
-              <h2>Request Data</h2>
-              <pre id="post-request-data"></pre>
-              <h2>Response Data</h2>
-              <pre id="post-response-data"></pre>
+
+          <!-- Login -->
+          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+            <h3 class="font-medium mb-3">Login</h3>
+            <div class="grid gap-3">
+              <div class="grid md:grid-cols-2 gap-3">
+                <label class="text-xs text-slate-400">
+                  <span class="block mb-1">Email</span>
+                  <input
+                    id="l-email"
+                    type="email"
+                    placeholder="user@example.com"
+                    class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  />
+                </label>
+                <label class="text-xs text-slate-400">
+                  <span class="block mb-1">Password</span>
+                  <input
+                    id="l-pass"
+                    type="password"
+                    placeholder="******"
+                    class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  />
+                </label>
+              </div>
+              <div class="flex flex-wrap gap-2 items-center">
+                <button
+                  id="btn-login"
+                  class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500"
+                >
+                  Login
+                </button>
+                <button
+                  id="btn-verify"
+                  class="inline-flex items-center justify-center rounded-md bg-slate-800 px-3 py-2 text-sm font-medium hover:bg-slate-700"
+                >
+                  Verify Token
+                </button>
+                <span class="text-xs text-slate-400"
+                  >Status:
+                  <span
+                    id="auth-pill"
+                    class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs border-slate-700 text-slate-300"
+                    >unknown</span
+                  ></span
+                >
+              </div>
+              <p class="text-xs text-slate-400">
+                POST /auth/login { email, password } • Token verify calls GET /users
+              </p>
             </div>
           </div>
         </div>
-      </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+          <h3 class="font-medium mb-3">Result</h3>
+          <pre
+            id="auth-out"
+            class="bg-slate-950/70 border border-slate-800 rounded-lg p-3 text-[12px] whitespace-pre-wrap max-h-72 overflow-auto"
+          ></pre>
+        </div>
+      </section>
+
+      <!-- Users Tab -->
+      <section id="tab-users" class="mt-4 grid gap-4 md:grid-cols-2 hidden">
+        <div class="grid gap-4">
+          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+            <h3 class="font-medium mb-3">All Users</h3>
+            <button
+              id="btn-users"
+              class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500"
+            >
+              Fetch Users
+            </button>
+            <p class="mt-2 text-xs text-slate-400">GET /users (requires Authorization)</p>
+          </div>
+
+          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+            <h3 class="font-medium mb-3">Create User</h3>
+            <div class="grid gap-3">
+              <div class="grid md:grid-cols-2 gap-3">
+                <label class="text-xs text-slate-400">
+                  <span class="block mb-1">Email</span>
+                  <input
+                    id="cu-email"
+                    type="email"
+                    class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  />
+                </label>
+                <label class="text-xs text-slate-400">
+                  <span class="block mb-1">Name</span>
+                  <input
+                    id="cu-name"
+                    class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  />
+                </label>
+              </div>
+              <div class="grid md:grid-cols-[1fr_auto] gap-3 items-end">
+                <label class="text-xs text-slate-400">
+                  <span class="block mb-1">Password</span>
+                  <input
+                    id="cu-pass"
+                    type="password"
+                    class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  />
+                </label>
+                <button
+                  id="btn-user-create"
+                  class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500"
+                >
+                  Create
+                </button>
+              </div>
+              <p class="text-xs text-slate-400">POST /users { email, name, password }</p>
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+            <h3 class="font-medium mb-3">By ID</h3>
+            <div class="grid gap-3">
+              <label class="text-xs text-slate-400">
+                <span class="block mb-1">User ID</span>
+                <input
+                  id="u-id"
+                  placeholder="id"
+                  class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                />
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  id="btn-user-get"
+                  class="inline-flex items-center justify-center rounded-md bg-slate-800 px-3 py-2 text-sm font-medium hover:bg-slate-700"
+                >
+                  GET
+                </button>
+                <button
+                  id="btn-user-update"
+                  class="inline-flex items-center justify-center rounded-md bg-slate-800 px-3 py-2 text-sm font-medium hover:bg-slate-700"
+                >
+                  PUT
+                </button>
+                <button
+                  id="btn-user-del"
+                  class="inline-flex items-center justify-center rounded-md bg-rose-600 px-3 py-2 text-sm font-medium hover:bg-rose-500"
+                >
+                  DELETE
+                </button>
+              </div>
+              <div class="grid md:grid-cols-2 gap-3">
+                <label class="text-xs text-slate-400">
+                  <span class="block mb-1">New Name</span>
+                  <input
+                    id="uu-name"
+                    class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  />
+                </label>
+                <label class="text-xs text-slate-400">
+                  <span class="block mb-1">New Email</span>
+                  <input
+                    id="uu-email"
+                    type="email"
+                    class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+          <h3 class="font-medium mb-3">Result</h3>
+          <pre
+            id="user-out"
+            class="bg-slate-950/70 border border-slate-800 rounded-lg p-3 text-[12px] whitespace-pre-wrap max-h-72 overflow-auto"
+          ></pre>
+        </div>
+      </section>
+
+      <!-- Posts Tab -->
+      <section id="tab-posts" class="mt-4 grid gap-4 md:grid-cols-2 hidden">
+        <div class="grid gap-4">
+          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+            <h3 class="font-medium mb-3">All Posts</h3>
+            <button
+              id="btn-posts"
+              class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500"
+            >
+              Fetch Posts
+            </button>
+            <p class="mt-2 text-xs text-slate-400">GET /posts (requires Authorization)</p>
+          </div>
+
+          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+            <h3 class="font-medium mb-3">Create Post</h3>
+            <div class="grid gap-3">
+              <label class="text-xs text-slate-400">
+                <span class="block mb-1">Title</span>
+                <input
+                  id="cp-title"
+                  class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                />
+              </label>
+              <label class="text-xs text-slate-400">
+                <span class="block mb-1">Content</span>
+                <textarea
+                  id="cp-content"
+                  class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                ></textarea>
+              </label>
+              <div class="grid md:grid-cols-[1fr_auto] gap-3 items-end">
+                <label class="text-xs text-slate-400">
+                  <span class="block mb-1">User ID</span>
+                  <input
+                    id="cp-user-id"
+                    class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                  />
+                </label>
+                <button
+                  id="btn-post-create"
+                  class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500"
+                >
+                  Create
+                </button>
+              </div>
+              <p class="text-xs text-slate-400">
+                POST /posts { title, content, userId } (requires Authorization)
+              </p>
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+            <h3 class="font-medium mb-3">By ID</h3>
+            <div class="grid gap-3">
+              <label class="text-xs text-slate-400">
+                <span class="block mb-1">Post ID</span>
+                <input
+                  id="p-id"
+                  placeholder="id"
+                  class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                />
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  id="btn-post-get"
+                  class="inline-flex items-center justify-center rounded-md bg-slate-800 px-3 py-2 text-sm font-medium hover:bg-slate-700"
+                >
+                  GET
+                </button>
+                <button
+                  id="btn-post-update"
+                  class="inline-flex items-center justify-center rounded-md bg-slate-800 px-3 py-2 text-sm font-medium hover:bg-slate-700"
+                >
+                  PUT
+                </button>
+                <button
+                  id="btn-post-del"
+                  class="inline-flex items-center justify-center rounded-md bg-rose-600 px-3 py-2 text-sm font-medium hover:bg-rose-500"
+                >
+                  DELETE
+                </button>
+              </div>
+              <label class="text-xs text-slate-400">
+                <span class="block mb-1">New Title</span>
+                <input
+                  id="up-title"
+                  class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                />
+              </label>
+              <label class="text-xs text-slate-400">
+                <span class="block mb-1">New Content</span>
+                <textarea
+                  id="up-content"
+                  class="w-full rounded-md bg-slate-900/70 border border-slate-800 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+                ></textarea>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+          <h3 class="font-medium mb-3">Result</h3>
+          <pre
+            id="post-out"
+            class="bg-slate-950/70 border border-slate-800 rounded-lg p-3 text-[12px] whitespace-pre-wrap max-h-72 overflow-auto"
+          ></pre>
+        </div>
+      </section>
+
+      <footer class="mt-8 text-center text-xs text-slate-400">
+        Built for sample-clean-architecture API • Adjust Base URL if your server runs on a different
+        port.
+      </footer>
+    </div>
 
     <script>
-      function openTab(evt, tabName) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName('tab-content');
-        for (i = 0; i < tabcontent.length; i++) {
-          tabcontent[i].style.display = 'none';
+      const $ = (id) => document.getElementById(id);
+      const qAll = (sel) => Array.from(document.querySelectorAll(sel));
+      let API = $('api-url').value.trim();
+
+      function headers(auth = false) {
+        const h = { 'Content-Type': 'application/json' };
+        if (auth) {
+          const t = $('access-token').value.trim();
+          if (t) h['Authorization'] = `Bearer ${t}`;
         }
-        tablinks = document.getElementsByClassName('tab-button');
-        for (i = 0; i < tablinks.length; i++) {
-          tablinks[i].className = tablinks[i].className.replace(' active', '');
+        return h;
+      }
+      function setPill(ok) {
+        const pill = $('auth-pill');
+        pill.textContent = ok === true ? 'ok' : ok === false ? 'invalid' : 'unknown';
+        pill.className = `inline-flex items-center rounded-full border px-2 py-0.5 text-xs ${ok === true ? 'border-emerald-500 text-emerald-400' : ok === false ? 'border-rose-500 text-rose-400' : 'border-slate-700 text-slate-300'}`;
+      }
+      async function call(outEl, method, path, body, auth = false) {
+        const url = `${API}${path}`;
+        try {
+          const res = await fetch(url, {
+            method,
+            headers: headers(auth),
+            body: method === 'GET' || method === 'DELETE' ? undefined : JSON.stringify(body ?? {}),
+          });
+          const data = await res.json().catch(() => ({ raw: 'Non-JSON response' }));
+          if (outEl)
+            outEl.textContent = JSON.stringify(
+              { status: res.status, ok: res.ok, body: data },
+              null,
+              2,
+            );
+          return { res, data };
+        } catch (e) {
+          if (outEl) outEl.textContent = JSON.stringify({ error: String(e) }, null, 2);
+          return null;
         }
-        document.getElementById(tabName).style.display = 'block';
-        evt.currentTarget.className += ' active';
       }
 
-      document.addEventListener('DOMContentLoaded', () => {
-        const API_URL = 'http://localhost:3000';
-        let accessToken = '';
+      // Tabs
+      qAll('.tab-btn').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          qAll('.tab-btn').forEach((b) => (b.dataset.active = 'false'));
+          btn.dataset.active = 'true';
+          const tab = btn.dataset.tab;
+          qAll('section[id^="tab-"]').forEach((s) => s.classList.add('hidden'));
+          document.getElementById(`tab-${tab}`).classList.remove('hidden');
+        }),
+      );
 
-        const authRequestData = document.getElementById('auth-request-data');
-        const authResponseData = document.getElementById('auth-response-data');
-        const userRequestData = document.getElementById('user-request-data');
-        const userResponseData = document.getElementById('user-response-data');
-        const postRequestData = document.getElementById('post-request-data');
-        const postResponseData = document.getElementById('post-response-data');
+      // Header controls
+      $('apply-url').addEventListener('click', () => {
+        API = $('api-url').value.trim().replace(/\/$/, '');
+      });
 
-        const accessTokenElement = document.getElementById('access-token');
-        const userMgmtTokenElement = document.getElementById('user-mgmt-token');
-        const postMgmtTokenElement = document.getElementById('post-mgmt-token');
-
-        const displayRequest = (element, method, url, headers, body) => {
-          let reqString = `Method: ${method}\nURL: ${url}`;
-          if (headers) {
-            reqString += `\nHeaders: ${JSON.stringify(headers, null, 2)}`;
-          }
-          if (body) {
-            reqString += `\nBody: ${JSON.stringify(body, null, 2)}`;
-          }
-          element.textContent = reqString;
+      // Auth actions
+      $('btn-register').addEventListener('click', async () => {
+        const body = {
+          email: $('r-email').value.trim(),
+          name: $('r-name').value.trim(),
+          password: $('r-pass').value,
         };
+        const result = await call($('auth-out'), 'POST', '/auth/register', body);
+        if (result?.data?.data?.token?.accessToken) {
+          $('access-token').value = result.data.data.token.accessToken;
+          setPill(true);
+        }
+      });
+      $('btn-login').addEventListener('click', async () => {
+        const body = { email: $('l-email').value.trim(), password: $('l-pass').value };
+        const result = await call($('auth-out'), 'POST', '/auth/login', body);
+        if (result?.data?.data?.token?.accessToken) {
+          $('access-token').value = result.data.data.token.accessToken;
+          setPill(true);
+        } else {
+          setPill(false);
+        }
+      });
+      $('btn-verify').addEventListener('click', async () => {
+        // Use protected route to validate token (works even if /auth/verify is not present)
+        const result = await call($('auth-out'), 'GET', '/users', undefined, true);
+        setPill(!!result?.res?.ok);
+      });
 
-        const displayResponse = (element, data) => {
-          element.textContent = JSON.stringify(data, null, 2);
+      // Users
+      $('btn-users').addEventListener('click', async () => {
+        await call($('user-out'), 'GET', '/users', undefined, true);
+      });
+      $('btn-user-create').addEventListener('click', async () => {
+        const body = {
+          email: $('cu-email').value.trim(),
+          name: $('cu-name').value.trim(),
+          password: $('cu-pass').value,
         };
+        await call($('user-out'), 'POST', '/users', body);
+      });
+      $('btn-user-get').addEventListener('click', async () => {
+        const id = $('u-id').value.trim();
+        if (!id) return alert('Provide user id');
+        await call($('user-out'), 'GET', `/users/${id}`);
+      });
+      $('btn-user-update').addEventListener('click', async () => {
+        const id = $('u-id').value.trim();
+        if (!id) return alert('Provide user id');
+        const body = {};
+        const n = $('uu-name').value.trim();
+        if (n) body.name = n;
+        const e = $('uu-email').value.trim();
+        if (e) body.email = e;
+        await call($('user-out'), 'PUT', `/users/${id}`, body);
+      });
+      $('btn-user-del').addEventListener('click', async () => {
+        const id = $('u-id').value.trim();
+        if (!id) return alert('Provide user id');
+        await call($('user-out'), 'DELETE', `/users/${id}`);
+      });
 
-        // --- Register User ---
-        const registerForm = document.getElementById('register-form');
-        registerForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const name = document.getElementById('register-name').value;
-          const email = document.getElementById('register-email').value;
-          const password = document.getElementById('register-password').value;
-          const body = { name, email, password };
-          const url = `${API_URL}/auth/register`;
-          displayRequest(authRequestData, 'POST', url, null, body);
-          try {
-            const response = await fetch(url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(body),
-            });
-            const data = await response.json();
-            displayResponse(authResponseData, data);
-          } catch (error) {
-            displayResponse(authResponseData, { error: error.message });
-          }
-        });
-
-        // --- Login User ---
-        const loginForm = document.getElementById('login-form');
-        loginForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const email = document.getElementById('login-email').value;
-          const password = document.getElementById('login-password').value;
-          const body = { email, password };
-          const url = `${API_URL}/auth/login`;
-          displayRequest(authRequestData, 'POST', url, null, body);
-          try {
-            const response = await fetch(url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(body),
-            });
-            const data = await response.json();
-            displayResponse(authResponseData, data);
-            if (response.ok && data.data.token) {
-              accessToken = data.data.token;
-              accessTokenElement.value = accessToken;
-            }
-          } catch (error) {
-            displayResponse(authResponseData, { error: error.message });
-          }
-        });
-
-        // --- Copy Token ---
-        const copyTokenBtn = document.getElementById('copy-token-btn');
-        copyTokenBtn.addEventListener('click', () => {
-          userMgmtTokenElement.value = accessTokenElement.value;
-          postMgmtTokenElement.value = accessTokenElement.value;
-        });
-
-        // --- Check Token ---
-        const checkTokenBtn = document.getElementById('check-token-btn');
-        checkTokenBtn.addEventListener('click', async () => {
-          const token = accessTokenElement.value;
-          if (!token) {
-            displayResponse(authResponseData, { error: 'Access token is empty.' });
-            return;
-          }
-
-          const url = `${API_URL}/auth/check`;
-          const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
-          displayRequest(authRequestData, 'GET', url, headers);
-
-          try {
-            const response = await fetch(url, { headers });
-            const data = await response.json();
-            displayResponse(authResponseData, data);
-          } catch (error) {
-            displayResponse(authResponseData, { error: error.message });
-          }
-        });
-
-        const getAuthHeaders = (tokenElement) => {
-          const token = tokenElement.value;
-          if (!token) return { 'Content-Type': 'application/json' };
-          return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+      // Posts
+      $('btn-posts').addEventListener('click', async () => {
+        await call($('post-out'), 'GET', '/posts', undefined, true);
+      });
+      $('btn-post-create').addEventListener('click', async () => {
+        const body = {
+          title: $('cp-title').value.trim(),
+          content: $('cp-content').value,
+          userId: $('cp-user-id').value.trim(),
         };
-
-        // --- Get All Users ---
-        const getUsersBtn = document.getElementById('get-users-btn');
-        getUsersBtn.addEventListener('click', async () => {
-          const url = `${API_URL}/users`;
-          const headers = getAuthHeaders(userMgmtTokenElement);
-          displayRequest(userRequestData, 'GET', url, headers);
-          try {
-            userResponseData.textContent = 'Loading...';
-            const response = await fetch(url, { headers });
-            const data = await response.json();
-            displayResponse(userResponseData, data);
-          } catch (error) {
-            displayResponse(userResponseData, { error: error.message });
-          }
-        });
-
-        // --- Get User by ID ---
-        const getUserByIdBtn = document.getElementById('get-user-by-id-btn');
-        getUserByIdBtn.addEventListener('click', async () => {
-          const id = document.getElementById('user-id').value;
-          if (!id) {
-            displayResponse(userResponseData, { error: 'Please enter a User ID.' });
-            return;
-          }
-          const url = `${API_URL}/users/${id}`;
-          const headers = getAuthHeaders(userMgmtTokenElement);
-          displayRequest(userRequestData, 'GET', url, headers);
-          try {
-            const response = await fetch(url, { headers });
-            const data = await response.json();
-            displayResponse(userResponseData, data);
-          } catch (error) {
-            displayResponse(userResponseData, { error: error.message });
-          }
-        });
-
-        // --- Delete User ---
-        const deleteUserBtn = document.getElementById('delete-user-btn');
-        deleteUserBtn.addEventListener('click', async () => {
-          const id = document.getElementById('user-id').value;
-          if (!id) {
-            displayResponse(userResponseData, { error: 'Please enter a User ID.' });
-            return;
-          }
-          if (!confirm(`Are you sure you want to delete user ${id}?`)) return;
-          const url = `${API_URL}/users/${id}`;
-          const headers = getAuthHeaders(userMgmtTokenElement);
-          displayRequest(userRequestData, 'DELETE', url, headers);
-          try {
-            const response = await fetch(url, { method: 'DELETE', headers });
-            displayResponse(userResponseData, {
-              status: response.status,
-              statusText: response.statusText,
-            });
-          } catch (error) {
-            displayResponse(userResponseData, { error: error.message });
-          }
-        });
-
-        // --- Update User ---
-        const updateUserForm = document.getElementById('update-user-form');
-        updateUserForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const id = document.getElementById('update-id').value;
-          const name = document.getElementById('update-name').value;
-          const email = document.getElementById('update-email').value;
-
-          const body = {};
-          if (name) body.name = name;
-          if (email) body.email = email;
-
-          if (Object.keys(body).length === 0) {
-            displayResponse(userResponseData, {
-              error: 'Please provide a new name or email to update.',
-            });
-            return;
-          }
-          const url = `${API_URL}/users/${id}`;
-          const headers = getAuthHeaders(userMgmtTokenElement);
-          displayRequest(userRequestData, 'PUT', url, headers, body);
-
-          try {
-            const response = await fetch(url, {
-              method: 'PUT',
-              headers,
-              body: JSON.stringify(body),
-            });
-            const data = await response.json();
-            displayResponse(userResponseData, data);
-          } catch (error) {
-            displayResponse(userResponseData, { error: error.message });
-          }
-        });
-
-        // --- Get All Posts ---
-        const getPostsBtn = document.getElementById('get-posts-btn');
-        getPostsBtn.addEventListener('click', async () => {
-            const url = `${API_URL}/posts`;
-            const headers = getAuthHeaders(postMgmtTokenElement);
-            displayRequest(postRequestData, 'GET', url, headers);
-            try {
-                postResponseData.textContent = 'Loading...';
-                const response = await fetch(url, { headers });
-                const data = await response.json();
-                displayResponse(postResponseData, data);
-            } catch (error) {
-                displayResponse(postResponseData, { error: error.message });
-            }
-        });
-
-        // --- Create Post ---
-        const createPostForm = document.getElementById('create-post-form');
-        createPostForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const title = document.getElementById('create-post-title').value;
-            const content = document.getElementById('create-post-content').value;
-            const body = { title, content };
-            const url = `${API_URL}/posts`;
-            const headers = getAuthHeaders(postMgmtTokenElement);
-            displayRequest(postRequestData, 'POST', url, headers, body);
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify(body),
-                });
-                const data = await response.json();
-                displayResponse(postResponseData, data);
-            } catch (error) {
-                displayResponse(postResponseData, { error: error.message });
-            }
-        });
-
-        // --- Get Post by ID ---
-        const getPostByIdBtn = document.getElementById('get-post-by-id-btn');
-        getPostByIdBtn.addEventListener('click', async () => {
-            const id = document.getElementById('post-id').value;
-            if (!id) {
-                displayResponse(postResponseData, { error: 'Please enter a Post ID.' });
-                return;
-            }
-            const url = `${API_URL}/posts/${id}`;
-            const headers = getAuthHeaders(postMgmtTokenElement);
-            displayRequest(postRequestData, 'GET', url, headers);
-            try {
-                const response = await fetch(url, { headers });
-                const data = await response.json();
-                displayResponse(postResponseData, data);
-            } catch (error) {
-                displayResponse(postResponseData, { error: error.message });
-            }
-        });
-
-        // --- Update Post ---
-        const updatePostBtn = document.getElementById('update-post-btn');
-        updatePostBtn.addEventListener('click', async () => {
-            const id = document.getElementById('post-id').value;
-            const title = document.getElementById('update-post-title').value;
-            const content = document.getElementById('update-post-content').value;
-
-            if (!id) {
-                displayResponse(postResponseData, { error: 'Please enter a Post ID.' });
-                return;
-            }
-
-            const body = {};
-            if (title) body.title = title;
-            if (content) body.content = content;
-
-            if (Object.keys(body).length === 0) {
-                displayResponse(postResponseData, {
-                    error: 'Please provide a new title or content to update.',
-                });
-                return;
-            }
-            const url = `${API_URL}/posts/${id}`;
-            const headers = getAuthHeaders(postMgmtTokenElement);
-            displayRequest(postRequestData, 'PUT', url, headers, body);
-
-            try {
-                const response = await fetch(url, {
-                    method: 'PUT',
-                    headers,
-                    body: JSON.stringify(body),
-                });
-                const data = await response.json();
-                displayResponse(postResponseData, data);
-            } catch (error) {
-                displayResponse(postResponseData, { error: error.message });
-            }
-        });
-
-        // --- Delete Post ---
-        const deletePostBtn = document.getElementById('delete-post-btn');
-        deletePostBtn.addEventListener('click', async () => {
-            const id = document.getElementById('post-id').value;
-            if (!id) {
-                displayResponse(postResponseData, { error: 'Please enter a Post ID.' });
-                return;
-            }
-            if (!confirm(`Are you sure you want to delete post ${id}?`)) return;
-            const url = `${API_URL}/posts/${id}`;
-            const headers = getAuthHeaders(postMgmtTokenElement);
-            displayRequest(postRequestData, 'DELETE', url, headers);
-            try {
-                const response = await fetch(url, { method: 'DELETE', headers });
-                displayResponse(postResponseData, {
-                    status: response.status,
-                    statusText: response.statusText,
-                });
-            } catch (error) {
-                displayResponse(postResponseData, { error: error.message });
-            }
-        });
+        await call($('post-out'), 'POST', '/posts', body, true);
+      });
+      $('btn-post-get').addEventListener('click', async () => {
+        const id = $('p-id').value.trim();
+        if (!id) return alert('Provide post id');
+        await call($('post-out'), 'GET', `/posts/${id}`, undefined, true);
+      });
+      $('btn-post-update').addEventListener('click', async () => {
+        const id = $('p-id').value.trim();
+        if (!id) return alert('Provide post id');
+        const body = {};
+        const t = $('up-title').value.trim();
+        if (t) body.title = t;
+        const c = $('up-content').value.trim();
+        if (c) body.content = c;
+        await call($('post-out'), 'PUT', `/posts/${id}`, body, true);
+      });
+      $('btn-post-del').addEventListener('click', async () => {
+        const id = $('p-id').value.trim();
+        if (!id) return alert('Provide post id');
+        await call($('post-out'), 'DELETE', `/posts/${id}`, undefined, true);
       });
     </script>
   </body>

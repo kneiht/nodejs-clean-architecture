@@ -1,8 +1,16 @@
 import { User } from '@/entities/user.entity.js';
 import { IUserRepository } from '@/application/dependency-interfaces/repositories/user.repository.js';
+import { PasswordHasher } from '@/adapters/utils/password.js';
+
+const passwordHasher = new PasswordHasher();
 
 export class UserInMemoryRepository implements IUserRepository {
   private users: User[] = [
+    new User({
+      email: 'admin@example.com',
+      name: 'Admin',
+      passwordHash: passwordHasher.hashSync('123123'),
+    }),
     new User({
       email: 'user1@example.com',
       name: 'User 1',
