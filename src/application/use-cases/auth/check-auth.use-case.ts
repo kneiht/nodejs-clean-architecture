@@ -7,9 +7,10 @@ import { failureUnauthorized, failureValidation, successOk, UseCaseReponse } fro
 
 // Define input schema
 const checkAuthInputSchema = z.object({
-  token: z.string().min(1, { error: 'Access token cannot be empty' }),
+  token: z.string('Access token is required').min(1, { error: 'Access token cannot be empty' }),
   roleToCheck: z.enum(['admin', 'user']).optional().default('user'),
 });
+
 // Define input
 export type CheckAuthUseCaseInput = z.infer<typeof checkAuthInputSchema>;
 

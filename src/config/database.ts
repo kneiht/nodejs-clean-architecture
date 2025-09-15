@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { env } from './environment';
+import { env } from './environment.js';
 
 // Database connection options
 const clientOptions: mongoose.ConnectOptions = {
@@ -21,7 +21,7 @@ export async function connectDb() {
     console.log('Successfully connected to MongoDB!');
   } catch (error) {
     throw new Error(
-      `Error connecting to MongoDB: ${error instanceof Error ? error.message : String(error)}`
+      `Error connecting to MongoDB: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
 }
@@ -33,7 +33,7 @@ export async function disconnectDb() {
     console.log('Disconnected from MongoDB!');
   } catch (error) {
     throw new Error(
-      `Error disconnecting from MongoDB: ${error instanceof Error ? error.message : String(error)}`
+      `Error disconnecting from MongoDB: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
 }

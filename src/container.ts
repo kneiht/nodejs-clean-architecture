@@ -22,11 +22,14 @@ import { RegisterUseCase } from '@/application/use-cases/auth/register.use-case.
 import { LoginUseCase } from '@/application/use-cases/auth/login.use-case.js';
 import { CheckAuthUseCase } from '@/application/use-cases/auth/check-auth.use-case.js';
 
+// Environment variables
+import { env } from '@/config/environment.js';
+
 // Adapters
 const passwordHasher = new PasswordHasher();
 const userRepository = new UserInMemoryRepository();
 const postRepository = new PostInMemoryRepository();
-const jsonWebToken = new JsonWebToken('your-secret-key'); // TODO: use environment variable
+const jsonWebToken = new JsonWebToken(env.JWT_SECRET);
 
 // Use Cases
 const addUserUseCase = new AddUserUseCase(userRepository, passwordHasher);

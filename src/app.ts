@@ -8,6 +8,8 @@ import authRoutes from './adapters/express/routes/auth.routes.js';
 import postRoutes from './adapters/express/routes/post.routes.js';
 import { checkAuthUseCase } from './container.js';
 
+import { env } from './config/environment.js';
+
 // Express
 const app = express();
 
@@ -29,7 +31,8 @@ app.get('/', (req, res) => {
 // Error handler
 app.use(errorHandler);
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
-  console.log('Test url: http://localhost:3000/test.html');
+const port = env.PORT;
+app.listen(port, () => {
+  console.log(`\nServer is running on port ${port}`);
+  console.log(`Test UI: http://localhost:${port}/test.html`);
 });

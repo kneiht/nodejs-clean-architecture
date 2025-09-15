@@ -11,6 +11,7 @@ import {
   successOk,
   UseCaseReponse,
 } from '../response.js';
+import { env } from '@/config/environment.js';
 
 // Define input schema
 const loginInputSchema = z.object({
@@ -66,8 +67,14 @@ export class LoginUseCase implements IUseCase<LoginUseCaseInput, LoginUseCaseDat
       const payload = { id: user.id, email: user.email, name: user.name, role: user.role };
 
       // Sign tokens
-      const accessToken = await this.jsonWebToken.sign(payload, ExpiresIn.ONE_HOUR);
-      const refreshToken = await this.jsonWebToken.sign(payload, ExpiresIn.SEVEN_DAYS);
+      const accessToken = await this.jsonWebToken.sign(
+        payload,
+        env.JWT_ACCESS_EXPIRES_IN as ExpiresIn,
+      );
+      const refreshToken = await this.jsonWebToken.sign(
+        payload,
+        env.JWT_REFRESH_EXPIRES_IN as ExpiresIn,
+      );
 
       // Return success response with user and tokens
       return successOk({
