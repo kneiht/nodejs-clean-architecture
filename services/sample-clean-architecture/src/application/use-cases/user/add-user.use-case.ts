@@ -1,3 +1,4 @@
+import z from 'zod';
 import { User } from '@/entities/user.entity.js';
 import { IUserRepository } from '@/application/dependency-interfaces/repositories/user.repository.js';
 import { IPasswordHasher } from '@/application/dependency-interfaces/utils/password.js';
@@ -10,12 +11,15 @@ import {
 } from '@/application/use-cases/response.js';
 import { EntityValidationError } from '@/entities/entity.error.js';
 
+// Define input schema
+const addUserInputSchema = z.object({
+  email: z.email({ error: 'Invalid email format' }),
+  name: z.string().min(3, { error: 'Name must be at least 3 characters long' }),
+  password: z.string().min(6, { error: 'Password must be at least 6 characters long' }),
+});
+
 // Define input
-export type AddUserUseCaseInput = {
-  email: string;
-  name: string;
-  password: string;
-};
+export type AddUserUseCaseInput = z.infer<typeof addUserInputSchema>;
 
 // Define data for the response
 export type AddUserUseCaseData = User;
@@ -32,17 +36,25 @@ export class AddUserUseCase implements IUseCase<AddUserUseCaseInput, AddUserUseC
   async execute(input: AddUserUseCaseInput): Promise<UseCaseReponse<AddUserUseCaseData>> {
     // Catch any errors
     try {
+      // Validate input
+      const result = addUserInputSchema.safeParse(input);
+      if (!result.success) {
+        return failureValidation(result.error.issues.map((iss) => iss.message).join(', '));
+      }
+
+      const { email, name, password } = result.data;
+
       // Check if the user already exists
-      const existingUser = await this.userRepository.findByEmail(input.email);
+      const existingUser = await this.userRepository.findByEmail(email);
       if (existingUser) {
         return failureValidation('User with this email already exists');
       }
 
       // Create the user
       const user = new User({
-        email: input.email,
-        name: input.name,
-        passwordHash: await this.passwordHasher.hash(input.password),
+        email,
+        name,
+        passwordHash: await this.passwordHasher.hash(password),
       });
 
       // Save the user

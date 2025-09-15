@@ -5,7 +5,7 @@ import { EntityValidationError } from './entity.error.js';
 // Define userSchema
 const userSchema = z.object({
   id: z.uuid({ error: 'ID must be a valid UUID' }),
-  name: z.string().min(3, { error: 'Name must be at least 3 character long' }),
+  name: z.string().min(3, { error: 'Name must be at least 3 characters long' }),
   email: z.email({ error: 'Invalid email format' }),
   passwordHash: z.string().min(1, 'Password hash cannot be empty'),
   createdAt: z.date(),

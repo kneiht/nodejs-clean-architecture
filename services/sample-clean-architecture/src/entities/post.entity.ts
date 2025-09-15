@@ -4,8 +4,8 @@ import z from 'zod';
 // Define postSchema
 const postSchema = z.object({
   id: z.uuid({ error: 'ID must be a valid UUID' }),
-  title: z.string().min(3, { error: 'Title must be at least 3 character long' }),
-  content: z.string().min(3, { error: 'Content must be at least 3 character long' }),
+  title: z.string().min(3, { error: 'Title must be at least 3 characters long' }),
+  content: z.string().min(3, { error: 'Content must be at least 3 characters long' }),
   userId: z.uuid({ error: 'User ID must be a valid UUID' }),
   createdAt: z.date(),
   updatedAt: z.date(),

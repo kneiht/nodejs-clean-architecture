@@ -1,4 +1,5 @@
 import { IUseCase } from '@/application/use-cases/index.js';
+import z from 'zod';
 import { IUserRepository } from '@/application/dependency-interfaces/repositories/user.repository.js';
 import { User } from '@/entities/user.entity.js';
 import {
@@ -10,12 +11,15 @@ import {
 } from '@/application/use-cases/response.js';
 import { EntityValidationError } from '@/entities/entity.error.js';
 
+// Define input schema
+const updateUserInputSchema = z.object({
+  id: z.string().min(1, { error: 'User ID cannot be empty' }),
+  name: z.string().min(3, { error: 'Name must be at least 3 characters long' }).optional(),
+  email: z.email({ error: 'Invalid email format' }).optional(),
+});
+
 // Define input
-export type UpdateUserUseCaseInput = {
-  id: string;
-  name?: string;
-  email?: string;
-};
+export type UpdateUserUseCaseInput = z.infer<typeof updateUserInputSchema>;
 
 // Define data for the response
 export type UpdateUserUseCaseData = User | null;
@@ -29,7 +33,13 @@ export class UpdateUserUseCase implements IUseCase<UpdateUserUseCaseInput, Updat
   async execute(input: UpdateUserUseCaseInput): Promise<UseCaseReponse<UpdateUserUseCaseData>> {
     // Catch any errors
     try {
-      const { id, ...updates } = input;
+      // Validate input
+      const result = updateUserInputSchema.safeParse(input);
+      if (!result.success) {
+        return failureValidation(result.error.issues.map((iss) => iss.message).join(', '));
+      }
+
+      const { id, ...updates } = result.data;
 
       // Find the user to update
       const user = await this.userRepository.findById(id);

@@ -1,16 +1,21 @@
+import z from 'zod';
 import { IUseCase } from '@/application/use-cases/index.js';
 import { IUserRepository } from '@/application/dependency-interfaces/repositories/user.repository.js';
 import {
   failureInternal,
   failureNotFound,
+  failureValidation,
   successNoContent,
   UseCaseReponse,
 } from '@/application/use-cases/response.js';
 
+// Define input schema
+const deleteUserInputSchema = z.object({
+  id: z.string().min(1, { error: 'User ID cannot be empty' }),
+});
+
 // Define input
-export type DeleteUserUseCaseInput = {
-  id: string;
-};
+export type DeleteUserUseCaseInput = z.infer<typeof deleteUserInputSchema>;
 
 // Define the use case
 export class DeleteUserUseCase implements IUseCase<DeleteUserUseCaseInput, void> {
@@ -18,9 +23,16 @@ export class DeleteUserUseCase implements IUseCase<DeleteUserUseCaseInput, void>
   constructor(private userRepository: IUserRepository) {}
 
   // Execute the use case
-  async execute({ id }: DeleteUserUseCaseInput): Promise<UseCaseReponse<void>> {
+  async execute(input: DeleteUserUseCaseInput): Promise<UseCaseReponse<void>> {
     // Catch any errors
     try {
+      // Validate input
+      const result = deleteUserInputSchema.safeParse(input);
+      if (!result.success) {
+        return failureValidation(result.error.issues.map((iss) => iss.message).join(', '));
+      }
+      const { id } = result.data;
+
       // Find the user to delete
       const user = await this.userRepository.findById(id);
       if (!user) {

@@ -1,19 +1,24 @@
+import z from 'zod';
 import { ExpiresIn, IJsonWebToken } from '@/application/dependency-interfaces/utils/jwt.js';
 import { User } from '@/entities/user.entity.js';
 import { IUseCase } from '../index.js';
 import { AddUserUseCase } from '../user/add-user.use-case.js';
 import {
   failureInternal,
+  failureValidation,
   successCreated,
   UseCaseReponse,
 } from '@/application/use-cases/response.js';
 
+// Define input schema
+const registerUserInputSchema = z.object({
+  email: z.email({ error: 'Invalid email format' }),
+  name: z.string().min(3, { error: 'Name must be at least 3 characters long' }),
+  password: z.string().min(6, { error: 'Password must be at least 6 characters long' }),
+});
+
 // Define input
-export type RegisterUseCaseInput = {
-  email: string;
-  name: string;
-  password: string;
-};
+export type RegisterUseCaseInput = z.infer<typeof registerUserInputSchema>;
 
 // Define data for the response
 export type RegisterUseCaseData = {
@@ -35,6 +40,12 @@ export class RegisterUseCase implements IUseCase<RegisterUseCaseInput, RegisterU
   async execute(input: RegisterUseCaseInput): Promise<UseCaseReponse<RegisterUseCaseData>> {
     // Catch any errors
     try {
+      // Validate input
+      const result = registerUserInputSchema.safeParse(input);
+      if (!result.success) {
+        return failureValidation(result.error.issues.map((iss) => iss.message).join(', '));
+      }
+
       // Use AddUserUseCase to create the user
       const addUserResponse = await this.addUserUseCase.execute(input);
 
