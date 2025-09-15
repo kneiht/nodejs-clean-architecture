@@ -6,17 +6,13 @@ import {
   getAllPostsUseCase,
   getPostByIdUseCase,
   updatePostUseCase,
-  checkAuthUseCase,
 } from '@/container.js';
-import { makeCheckAuthMiddleware } from '../middlewares/auth.middleware.js';
 
 const postRoutes = Router();
-const checkAuthMiddleware = makeCheckAuthMiddleware(checkAuthUseCase);
-
-postRoutes.get('/', checkAuthMiddleware, basicController(getAllPostsUseCase));
-postRoutes.post('/', checkAuthMiddleware, basicController(addPostUseCase));
-postRoutes.get('/:id', checkAuthMiddleware, basicController(getPostByIdUseCase));
-postRoutes.put('/:id', checkAuthMiddleware, basicController(updatePostUseCase));
-postRoutes.delete('/:id', checkAuthMiddleware, basicController(deletePostUseCase));
+postRoutes.get('/', basicController(getAllPostsUseCase));
+postRoutes.post('/', basicController(addPostUseCase));
+postRoutes.get('/:id', basicController(getPostByIdUseCase));
+postRoutes.put('/:id', basicController(updatePostUseCase));
+postRoutes.delete('/:id', basicController(deletePostUseCase));
 
 export default postRoutes;

@@ -8,6 +8,7 @@ const userSchema = z.object({
   name: z.string().min(3, { error: 'Name must be at least 3 characters long' }),
   email: z.email({ error: 'Invalid email format' }),
   passwordHash: z.string().min(1, 'Password hash cannot be empty'),
+  role: z.enum(['admin', 'user'], { error: 'Role must be either admin or user' }),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -17,6 +18,7 @@ export class User {
   public readonly id: string;
   public email: string;
   public name: string;
+  public role: 'admin' | 'user';
   private passwordHash: string;
   public readonly createdAt: Date;
   public updatedAt: Date;
@@ -28,6 +30,7 @@ export class User {
     this.id = id ?? uuidv7();
     this.email = props.email;
     this.name = props.name;
+    this.role = props.role;
     this.passwordHash = props.passwordHash;
     const now = new Date();
     this.createdAt = now;
@@ -53,6 +56,7 @@ export class User {
       id: this.id,
       email: this.email,
       name: this.name,
+      role: this.role,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };

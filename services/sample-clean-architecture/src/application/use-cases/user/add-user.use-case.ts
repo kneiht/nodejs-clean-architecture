@@ -16,6 +16,7 @@ const addUserInputSchema = z.object({
   email: z.email({ error: 'Invalid email format' }),
   name: z.string().min(3, { error: 'Name must be at least 3 characters long' }),
   password: z.string().min(6, { error: 'Password must be at least 6 characters long' }),
+  role: z.enum(['admin', 'user']).optional().default('user'),
 });
 
 // Define input
@@ -42,7 +43,7 @@ export class AddUserUseCase implements IUseCase<AddUserUseCaseInput, AddUserUseC
         return failureValidation(result.error.issues.map((iss) => iss.message).join(', '));
       }
 
-      const { email, name, password } = result.data;
+      const { email, name, password, role } = result.data;
 
       // Check if the user already exists
       const existingUser = await this.userRepository.findByEmail(email);
@@ -54,6 +55,7 @@ export class AddUserUseCase implements IUseCase<AddUserUseCaseInput, AddUserUseC
       const user = new User({
         email,
         name,
+        role: role ?? 'user',
         passwordHash: await this.passwordHasher.hash(password),
       });
 

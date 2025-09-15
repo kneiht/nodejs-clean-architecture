@@ -16,6 +16,7 @@ const updateUserInputSchema = z.object({
   id: z.string().min(1, { error: 'User ID cannot be empty' }),
   name: z.string().min(3, { error: 'Name must be at least 3 characters long' }).optional(),
   email: z.email({ error: 'Invalid email format' }).optional(),
+  role: z.enum(['admin', 'user']).optional(),
 });
 
 // Define input
@@ -58,6 +59,9 @@ export class UpdateUserUseCase implements IUseCase<UpdateUserUseCaseInput, Updat
           return failureValidation('Email already in use by another account');
         }
         user.email = updates.email;
+      }
+      if (updates.role) {
+        user.role = updates.role;
       }
 
       // Validate the entity after changes

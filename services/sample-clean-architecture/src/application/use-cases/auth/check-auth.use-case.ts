@@ -6,12 +6,12 @@ import { User } from '@/entities/user.entity.js';
 import { failureUnauthorized, failureValidation, successOk, UseCaseReponse } from '../response.js';
 
 // Define input schema
-const checkAuthInputSchema = z
-  .string({ error: 'Access token is missing' })
-  .min(1, { error: 'Access token cannot be empty' });
-
+const checkAuthInputSchema = z.object({
+  token: z.string().min(1, { error: 'Access token cannot be empty' }),
+  roleToCheck: z.enum(['admin', 'user']).optional().default('user'),
+});
 // Define input
-export type CheckAuthUseCaseInput = z.infer<typeof checkAuthInputSchema> | undefined;
+export type CheckAuthUseCaseInput = z.infer<typeof checkAuthInputSchema>;
 
 // Define data for the response
 export type CheckAuthUseCaseData = User;
@@ -34,7 +34,7 @@ export class CheckAuthUseCase implements IUseCase<CheckAuthUseCaseInput, CheckAu
         const errorMessage = result.error.issues.map((iss) => iss.message).join(', ');
         return failureValidation(errorMessage);
       }
-      const token = result.data;
+      const { token, roleToCheck } = result.data;
 
       // Verify the token
       const payload = await this.jsonWebToken.verify(token);
@@ -46,6 +46,11 @@ export class CheckAuthUseCase implements IUseCase<CheckAuthUseCaseInput, CheckAu
       const user = await this.userRepository.findById(payload.id);
       if (!user) {
         return failureUnauthorized('User not found');
+      }
+
+      // Check role
+      if (user.role !== roleToCheck) {
+        return failureUnauthorized('User role does not match');
       }
 
       // Return the user

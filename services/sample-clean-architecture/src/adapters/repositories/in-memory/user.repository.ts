@@ -9,21 +9,25 @@ export class UserInMemoryRepository implements IUserRepository {
     new User({
       email: 'admin@example.com',
       name: 'Admin',
+      role: 'admin',
       passwordHash: passwordHasher.hashSync('123123'),
     }),
     new User({
       email: 'user1@example.com',
       name: 'User 1',
+      role: 'user',
       passwordHash: 'passwordHash1',
     }),
     new User({
       email: 'user2@example.com',
       name: 'User 2',
+      role: 'user',
       passwordHash: 'passwordHash2',
     }),
     new User({
       email: 'user3@example.com',
       name: 'User 3',
+      role: 'user',
       passwordHash: 'passwordHash3',
     }),
   ];

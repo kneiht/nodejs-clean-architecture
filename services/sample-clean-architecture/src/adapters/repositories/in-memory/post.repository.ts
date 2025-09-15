@@ -1,8 +1,25 @@
 import { Post } from '@/entities/post.entity.js';
 import { IPostRepository } from '@/application/dependency-interfaces/repositories/post.repository.js';
+import { uuidv7 } from 'uuidv7';
 
 export class PostInMemoryRepository implements IPostRepository {
-  private posts: Post[] = [];
+  private posts: Post[] = [
+    new Post({
+      title: 'Post 1',
+      content: 'Content 1',
+      userId: uuidv7().toString(),
+    }),
+    new Post({
+      title: 'Post 2',
+      content: 'Content 2',
+      userId: uuidv7().toString(),
+    }),
+    new Post({
+      title: 'Post 3',
+      content: 'Content 3',
+      userId: uuidv7().toString(),
+    }),
+  ];
 
   async findById(id: string): Promise<Post | null> {
     return this.posts.find((post) => post.id === id) || null;

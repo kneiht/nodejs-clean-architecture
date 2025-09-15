@@ -63,7 +63,7 @@ export class LoginUseCase implements IUseCase<LoginUseCaseInput, LoginUseCaseDat
       }
 
       // Create JWT payload
-      const payload = { id: user.id, email: user.email, name: user.name };
+      const payload = { id: user.id, email: user.email, name: user.name, role: user.role };
 
       // Sign tokens
       const accessToken = await this.jsonWebToken.sign(payload, ExpiresIn.ONE_HOUR);
