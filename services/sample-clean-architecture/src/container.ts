@@ -1,4 +1,4 @@
-import { UserInMemoryRepository } from '@/adapters/repositories/user.repository.js';
+import { UserInMemoryRepository } from '@/adapters/repositories/in-memory/user.repository.js';
 import { PasswordHasher } from '@/adapters/utils/password.js';
 import { JsonWebToken } from '@/adapters/utils/jwt.js';
 

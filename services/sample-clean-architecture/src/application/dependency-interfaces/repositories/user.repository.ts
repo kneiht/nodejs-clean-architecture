@@ -1,10 +1,6 @@
 import { User } from '@/entities/user.entity.js';
+import { IBaseRepository } from './base.repository.js';
 
-export interface IUserRepository {
-  findById(id: string): Promise<User | null>;
+export interface IUserRepository extends IBaseRepository<User> {
   findByEmail(email: string): Promise<User | null>;
-  findAll(): Promise<User[]>;
-  add(user: User): Promise<User>;
-  update(user: User): Promise<User>;
-  delete(user: User): Promise<void>;
 }
