@@ -4,6 +4,7 @@ import { errorHandler } from './adapters/express/middlewares/error-handler.middl
 
 import userRoutes from './adapters/express/routes/user.routes.js';
 import authRoutes from './adapters/express/routes/auth.routes.js';
+import postRoutes from './adapters/express/routes/post.routes.js';
 
 // Express
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.static('public'));
 // Routes
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes);
+app.use('/posts', postRoutes);
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });

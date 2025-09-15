@@ -139,6 +139,9 @@
       <button class="tab-button" onclick="openTab(event, 'user-management')">
         User Management
       </button>
+      <button class="tab-button" onclick="openTab(event, 'post-management')">
+        Post Management
+      </button>
     </div>
 
     <div id="auth" class="tab-content active">
@@ -164,7 +167,7 @@
           <div class="card">
             <h2>Access Token</h2>
             <textarea id="access-token" rows="5"></textarea>
-            <button id="copy-token-btn">Copy to User Management</button>
+            <button id="copy-token-btn">Copy Token</button>
             <button id="check-token-btn" style="margin-top: 5px;">Check Token</button>
           </div>
         </div>
@@ -225,6 +228,54 @@
       </div>
     </div>
 
+    <div id="post-management" class="tab-content">
+        <div class="content-grid">
+          <div>
+            <div class="card">
+              <h2>Authorization</h2>
+              <textarea
+                id="post-mgmt-token"
+                placeholder="Login to get a token and copy it here"
+                rows="5"
+              ></textarea>
+            </div>
+            <div class="card">
+              <h2>Get All Posts</h2>
+              <button id="get-posts-btn">Fetch All Posts</button>
+            </div>
+            <div class="card">
+              <h2>Create Post</h2>
+              <form id="create-post-form">
+                <input type="text" id="create-post-title" placeholder="Title" required />
+                <textarea id="create-post-content" placeholder="Content" required></textarea>
+                <button type="submit">Create Post</button>
+              </form>
+            </div>
+            <div class="card">
+              <h2>Get/Update/Delete by ID</h2>
+              <form id="gud-post-form">
+                <input type="text" id="post-id" placeholder="Post ID" required />
+                <input type="text" id="update-post-title" placeholder="New Title (for update)" />
+                <textarea id="update-post-content" placeholder="New Content (for update)"></textarea>
+                <button type="button" id="get-post-by-id-btn">Get Post</button>
+                <button type="button" id="update-post-btn" style="margin-top: 5px;">Update Post</button>
+                <button type="button" id="delete-post-btn" class="danger" style="margin-top: 5px">
+                  Delete Post
+                </button>
+              </form>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <h2>Request Data</h2>
+              <pre id="post-request-data"></pre>
+              <h2>Response Data</h2>
+              <pre id="post-response-data"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
     <script>
       function openTab(evt, tabName) {
         var i, tabcontent, tablinks;
@@ -248,8 +299,12 @@
         const authResponseData = document.getElementById('auth-response-data');
         const userRequestData = document.getElementById('user-request-data');
         const userResponseData = document.getElementById('user-response-data');
+        const postRequestData = document.getElementById('post-request-data');
+        const postResponseData = document.getElementById('post-response-data');
+
         const accessTokenElement = document.getElementById('access-token');
         const userMgmtTokenElement = document.getElementById('user-mgmt-token');
+        const postMgmtTokenElement = document.getElementById('post-mgmt-token');
 
         const displayRequest = (element, method, url, headers, body) => {
           let reqString = `Method: ${method}\nURL: ${url}`;
@@ -306,8 +361,8 @@
             });
             const data = await response.json();
             displayResponse(authResponseData, data);
-            if (response.ok && data.token) {
-              accessToken = data.token.accessToken;
+            if (response.ok && data.data.token) {
+              accessToken = data.data.token;
               accessTokenElement.value = accessToken;
             }
           } catch (error) {
@@ -319,6 +374,7 @@
         const copyTokenBtn = document.getElementById('copy-token-btn');
         copyTokenBtn.addEventListener('click', () => {
           userMgmtTokenElement.value = accessTokenElement.value;
+          postMgmtTokenElement.value = accessTokenElement.value;
         });
 
         // --- Check Token ---
@@ -330,7 +386,7 @@
             return;
           }
 
-          const url = `${API_URL}/users`; // A protected endpoint
+          const url = `${API_URL}/auth/check`;
           const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
           displayRequest(authRequestData, 'GET', url, headers);
 
@@ -343,8 +399,8 @@
           }
         });
 
-        const getAuthHeaders = () => {
-          const token = userMgmtTokenElement.value;
+        const getAuthHeaders = (tokenElement) => {
+          const token = tokenElement.value;
           if (!token) return { 'Content-Type': 'application/json' };
           return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
         };
@@ -353,7 +409,7 @@
         const getUsersBtn = document.getElementById('get-users-btn');
         getUsersBtn.addEventListener('click', async () => {
           const url = `${API_URL}/users`;
-          const headers = getAuthHeaders();
+          const headers = getAuthHeaders(userMgmtTokenElement);
           displayRequest(userRequestData, 'GET', url, headers);
           try {
             userResponseData.textContent = 'Loading...';
@@ -374,7 +430,7 @@
             return;
           }
           const url = `${API_URL}/users/${id}`;
-          const headers = getAuthHeaders();
+          const headers = getAuthHeaders(userMgmtTokenElement);
           displayRequest(userRequestData, 'GET', url, headers);
           try {
             const response = await fetch(url, { headers });
@@ -395,7 +451,7 @@
           }
           if (!confirm(`Are you sure you want to delete user ${id}?`)) return;
           const url = `${API_URL}/users/${id}`;
-          const headers = getAuthHeaders();
+          const headers = getAuthHeaders(userMgmtTokenElement);
           displayRequest(userRequestData, 'DELETE', url, headers);
           try {
             const response = await fetch(url, { method: 'DELETE', headers });
@@ -427,12 +483,12 @@
             return;
           }
           const url = `${API_URL}/users/${id}`;
-          const headers = getAuthHeaders();
-          displayRequest(userRequestData, 'PATCH', url, headers, body);
+          const headers = getAuthHeaders(userMgmtTokenElement);
+          displayRequest(userRequestData, 'PUT', url, headers, body);
 
           try {
             const response = await fetch(url, {
-              method: 'PATCH',
+              method: 'PUT',
               headers,
               body: JSON.stringify(body),
             });
@@ -441,6 +497,127 @@
           } catch (error) {
             displayResponse(userResponseData, { error: error.message });
           }
+        });
+
+        // --- Get All Posts ---
+        const getPostsBtn = document.getElementById('get-posts-btn');
+        getPostsBtn.addEventListener('click', async () => {
+            const url = `${API_URL}/posts`;
+            const headers = getAuthHeaders(postMgmtTokenElement);
+            displayRequest(postRequestData, 'GET', url, headers);
+            try {
+                postResponseData.textContent = 'Loading...';
+                const response = await fetch(url, { headers });
+                const data = await response.json();
+                displayResponse(postResponseData, data);
+            } catch (error) {
+                displayResponse(postResponseData, { error: error.message });
+            }
+        });
+
+        // --- Create Post ---
+        const createPostForm = document.getElementById('create-post-form');
+        createPostForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('create-post-title').value;
+            const content = document.getElementById('create-post-content').value;
+            const body = { title, content };
+            const url = `${API_URL}/posts`;
+            const headers = getAuthHeaders(postMgmtTokenElement);
+            displayRequest(postRequestData, 'POST', url, headers, body);
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(body),
+                });
+                const data = await response.json();
+                displayResponse(postResponseData, data);
+            } catch (error) {
+                displayResponse(postResponseData, { error: error.message });
+            }
+        });
+
+        // --- Get Post by ID ---
+        const getPostByIdBtn = document.getElementById('get-post-by-id-btn');
+        getPostByIdBtn.addEventListener('click', async () => {
+            const id = document.getElementById('post-id').value;
+            if (!id) {
+                displayResponse(postResponseData, { error: 'Please enter a Post ID.' });
+                return;
+            }
+            const url = `${API_URL}/posts/${id}`;
+            const headers = getAuthHeaders(postMgmtTokenElement);
+            displayRequest(postRequestData, 'GET', url, headers);
+            try {
+                const response = await fetch(url, { headers });
+                const data = await response.json();
+                displayResponse(postResponseData, data);
+            } catch (error) {
+                displayResponse(postResponseData, { error: error.message });
+            }
+        });
+
+        // --- Update Post ---
+        const updatePostBtn = document.getElementById('update-post-btn');
+        updatePostBtn.addEventListener('click', async () => {
+            const id = document.getElementById('post-id').value;
+            const title = document.getElementById('update-post-title').value;
+            const content = document.getElementById('update-post-content').value;
+
+            if (!id) {
+                displayResponse(postResponseData, { error: 'Please enter a Post ID.' });
+                return;
+            }
+
+            const body = {};
+            if (title) body.title = title;
+            if (content) body.content = content;
+
+            if (Object.keys(body).length === 0) {
+                displayResponse(postResponseData, {
+                    error: 'Please provide a new title or content to update.',
+                });
+                return;
+            }
+            const url = `${API_URL}/posts/${id}`;
+            const headers = getAuthHeaders(postMgmtTokenElement);
+            displayRequest(postRequestData, 'PUT', url, headers, body);
+
+            try {
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers,
+                    body: JSON.stringify(body),
+                });
+                const data = await response.json();
+                displayResponse(postResponseData, data);
+            } catch (error) {
+                displayResponse(postResponseData, { error: error.message });
+            }
+        });
+
+        // --- Delete Post ---
+        const deletePostBtn = document.getElementById('delete-post-btn');
+        deletePostBtn.addEventListener('click', async () => {
+            const id = document.getElementById('post-id').value;
+            if (!id) {
+                displayResponse(postResponseData, { error: 'Please enter a Post ID.' });
+                return;
+            }
+            if (!confirm(`Are you sure you want to delete post ${id}?`)) return;
+            const url = `${API_URL}/posts/${id}`;
+            const headers = getAuthHeaders(postMgmtTokenElement);
+            displayRequest(postRequestData, 'DELETE', url, headers);
+            try {
+                const response = await fetch(url, { method: 'DELETE', headers });
+                displayResponse(postResponseData, {
+                    status: response.status,
+                    statusText: response.statusText,
+                });
+            } catch (error) {
+                displayResponse(postResponseData, { error: error.message });
+            }
         });
       });
     </script>
