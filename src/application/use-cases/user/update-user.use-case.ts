@@ -63,6 +63,7 @@ export class UpdateUserUseCase implements IUseCase<UpdateUserUseCaseInput, Updat
       if (updates.role) {
         user.role = updates.role;
       }
+      user.updatedAt = new Date();
 
       // Validate the entity after changes
       user.validate();

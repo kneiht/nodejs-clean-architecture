@@ -1,7 +1,7 @@
 export type JwtPayload = {
   id: string;
   email: string;
-  name: string;
+  name?: string;
   role: 'admin' | 'user';
 };
 

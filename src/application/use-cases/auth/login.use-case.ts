@@ -86,6 +86,7 @@ export class LoginUseCase implements IUseCase<LoginUseCaseInput, LoginUseCaseDat
       });
     } catch (error) {
       // Handle other errors
+      console.log(error);
       return failureInternal('An unexpected error occurred during login.');
     }
   }

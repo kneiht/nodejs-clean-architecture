@@ -1,5 +1,8 @@
-import { UserInMemoryRepository } from '@/adapters/repositories/in-memory/user.repository.js';
-import { PostInMemoryRepository } from '@/adapters/repositories/in-memory/post.repository.js';
+import {
+  UserInMemoryRepository,
+  PostInMemoryRepository,
+} from '@/adapters/repositories/in-memory/index.js';
+import { UserMongoRepository, PostMongoRepository } from '@/adapters/repositories/mongodb/index.js';
 import { PasswordHasher } from '@/adapters/utils/password.js';
 import { JsonWebToken } from '@/adapters/utils/jwt.js';
 
@@ -27,9 +30,13 @@ import { env } from '@/config/environment.js';
 
 // Adapters
 const passwordHasher = new PasswordHasher();
-const userRepository = new UserInMemoryRepository();
-const postRepository = new PostInMemoryRepository();
 const jsonWebToken = new JsonWebToken(env.JWT_SECRET);
+
+// Repositories
+const userRepository =
+  env.DB_SELECT === 'MONGODB' ? new UserMongoRepository() : new UserInMemoryRepository();
+const postRepository =
+  env.DB_SELECT === 'MONGODB' ? new PostMongoRepository() : new PostInMemoryRepository();
 
 // Use Cases
 const addUserUseCase = new AddUserUseCase(userRepository, passwordHasher);

@@ -1,6 +1,6 @@
 import { IUseCase } from '@/application/use-cases/index.js';
 import { ErrorType, SuccessType } from '@/application/use-cases/response.js';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 
 // Extract request data
 export function extractor(req: Request) {

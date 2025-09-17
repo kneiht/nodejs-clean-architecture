@@ -18,6 +18,7 @@ export class GetAllPostsUseCase implements IUseCase<void, Post[]> {
       return successOk(posts);
     } catch (error) {
       // Handle other errors
+      console.log(error);
       return failureInternal('An unexpected error occurred while retrieving posts.');
     }
   }

@@ -14,7 +14,7 @@ import { env } from '@/config/environment.js';
 // Define input schema
 const registerUserInputSchema = z.object({
   email: z.email({ error: 'Invalid email format' }),
-  name: z.string().min(3, { error: 'Name must be at least 3 characters long' }),
+  name: z.string().min(3, { error: 'Name must be at least 3 characters long' }).optional(),
   password: z.string().min(6, { error: 'Password must be at least 6 characters long' }),
   role: z.enum(['admin', 'user']).optional().default('user'),
 });
@@ -81,6 +81,7 @@ export class RegisterUseCase implements IUseCase<RegisterUseCaseInput, RegisterU
       });
     } catch (error) {
       // Handle other errors
+      console.log(error);
       return failureInternal('An unexpected error occurred during registration.');
     }
   }

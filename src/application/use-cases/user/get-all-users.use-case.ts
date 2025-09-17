@@ -18,6 +18,7 @@ export class GetAllUsersUseCase implements IUseCase<void, User[]> {
       return successOk(users);
     } catch (error) {
       // Handle other errors
+      console.log(error);
       return failureInternal('An unexpected error occurred while retrieving users.');
     }
   }

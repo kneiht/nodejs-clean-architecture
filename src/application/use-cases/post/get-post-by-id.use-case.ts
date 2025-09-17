@@ -51,6 +51,7 @@ export class GetPostByIdUseCase
       return successOk(post);
     } catch (error) {
       // Handle other errors
+      console.log(error);
       return failureInternal('An unexpected error occurred while retrieving the post.');
     }
   }

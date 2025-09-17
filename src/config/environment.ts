@@ -21,6 +21,7 @@ export const env = {
   JWT_ACCESS_EXPIRES_IN: process.env.JWT_EXPIRES_IN?.toString() || '1h',
   JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN?.toString() || '7h',
   BCRYPT_ROUNDS: process.env.BCRYPT_ROUNDS?.toString() || '12',
+  DB_SELECT: process.env.DB_SELECT?.toString() || 'IN_MEMORY',
 };
 
 // Environment type checking
@@ -42,3 +43,4 @@ console.log(`     - JWT_SECRET: ${env.JWT_SECRET ? '✅ Set' : '❌ Missing'}`);
 console.log(`     - JWT_ACCESS_EXPIRES_IN: ${env.JWT_ACCESS_EXPIRES_IN}`);
 console.log(`     - JWT_REFRESH_EXPIRES_IN: ${env.JWT_REFRESH_EXPIRES_IN}`);
 console.log(`     - BCRYPT_ROUNDS: ${env.BCRYPT_ROUNDS}`);
+console.log(`     - DB_SELECT: ${env.DB_SELECT}`);

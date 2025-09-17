@@ -46,6 +46,7 @@ export class DeletePostUseCase implements IUseCase<DeletePostUseCaseInput, void>
       return successNoContent();
     } catch (error) {
       // Handle other errors
+      console.log(error);
       return failureInternal('An unexpected error occurred while deleting the post.');
     }
   }

@@ -57,6 +57,7 @@ export class CheckAuthUseCase implements IUseCase<CheckAuthUseCaseInput, CheckAu
       // Return the user
       return successOk(user);
     } catch (error) {
+      console.log(error);
       return failureUnauthorized('Authentication failed');
     }
   }
