@@ -27,7 +27,9 @@ export function extractor(req: Request) {
 }
 
 // Status code converter
-export function statusCodeConverter(useCaseResponseType: ErrorType | SuccessType | undefined) {
+export function statusCodeConverter(
+  useCaseResponseType: ErrorType | SuccessType | undefined,
+) {
   switch (useCaseResponseType) {
     case ErrorType.VALIDATION:
       return 400;

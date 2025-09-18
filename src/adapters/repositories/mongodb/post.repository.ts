@@ -3,7 +3,10 @@ import { IPostRepository } from '@/application/dependency-interfaces/repositorie
 import { PostModel } from './schemas/post.schema.js';
 import { MongoRepository } from './base.repository.js';
 
-export class PostMongoRepository extends MongoRepository<Post> implements IPostRepository {
+export class PostMongoRepository
+  extends MongoRepository<Post>
+  implements IPostRepository
+{
   constructor() {
     super(PostModel);
   }

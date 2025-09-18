@@ -1,6 +1,5 @@
 import z from 'zod';
 import { EntityValidationError } from './entity.error.js';
-import { IEntityStaticMethods } from './entity.interface.js';
 
 // Define param schemas
 const idSchema = z.string({ error: 'ID must be a string' });
@@ -59,7 +58,9 @@ export class Post {
   public validate(): void {
     const result = postSchema.safeParse(this);
     if (!result.success) {
-      throw new EntityValidationError(result.error.issues.map((iss) => iss.message).join(', '));
+      throw new EntityValidationError(
+        result.error.issues.map((iss) => iss.message).join(', '),
+      );
     }
   }
 

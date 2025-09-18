@@ -3,11 +3,18 @@ import { IJsonWebToken } from '@/application/dependency-interfaces/utils/jwt.js'
 import { IUserRepository } from '@/application/dependency-interfaces/repositories/user.repository.js';
 import { IUseCase } from '@/application/use-cases/index.js';
 import { User } from '@/entities/user.entity.js';
-import { failureUnauthorized, failureValidation, successOk, UseCaseReponse } from '../response.js';
+import {
+  failureUnauthorized,
+  failureValidation,
+  successOk,
+  UseCaseReponse,
+} from '../response.js';
 
 // Define input schema
 const checkAuthInputSchema = z.object({
-  token: z.string('Access token is required').min(1, { error: 'Access token cannot be empty' }),
+  token: z
+    .string('Access token is required')
+    .min(1, { error: 'Access token cannot be empty' }),
   roleToCheck: z.enum(['admin', 'user']).optional().default('user'),
 });
 
@@ -18,7 +25,9 @@ export type CheckAuthUseCaseInput = z.infer<typeof checkAuthInputSchema>;
 export type CheckAuthUseCaseData = User;
 
 // Define the use case
-export class CheckAuthUseCase implements IUseCase<CheckAuthUseCaseInput, CheckAuthUseCaseData> {
+export class CheckAuthUseCase
+  implements IUseCase<CheckAuthUseCaseInput, CheckAuthUseCaseData>
+{
   // Inject dependencies
   constructor(
     private jsonWebToken: IJsonWebToken,
@@ -26,13 +35,17 @@ export class CheckAuthUseCase implements IUseCase<CheckAuthUseCaseInput, CheckAu
   ) {}
 
   // Execute the use case
-  async execute(input: CheckAuthUseCaseInput): Promise<UseCaseReponse<CheckAuthUseCaseData>> {
+  async execute(
+    input: CheckAuthUseCaseInput,
+  ): Promise<UseCaseReponse<CheckAuthUseCaseData>> {
     // Catch any errors
     try {
       // Validate input
       const result = checkAuthInputSchema.safeParse(input);
       if (!result.success) {
-        const errorMessage = result.error.issues.map((iss) => iss.message).join(', ');
+        const errorMessage = result.error.issues
+          .map((iss) => iss.message)
+          .join(', ');
         return failureValidation(errorMessage);
       }
       const { token, roleToCheck } = result.data;

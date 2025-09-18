@@ -23,7 +23,10 @@ const initialPosts = [
   ),
 ];
 
-export class PostInMemoryRepository extends InMemoryRepository<Post> implements IPostRepository {
+export class PostInMemoryRepository
+  extends InMemoryRepository<Post>
+  implements IPostRepository
+{
   constructor() {
     // Pass initial data to the base class
     super(initialPosts);

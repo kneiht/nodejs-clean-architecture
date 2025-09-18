@@ -27,7 +27,9 @@ export class UpdateUseCase<TEntity, TInput extends { id: string }>
   protected async handleInput(input: TInput): Promise<TInput> {
     const validationResult = this.validationSchema.safeParse(input);
     if (!validationResult.success) {
-      const errorMessage = validationResult.error.issues.map((iss) => iss.message).join(', ');
+      const errorMessage = validationResult.error.issues
+        .map((iss) => iss.message)
+        .join(', ');
       throw new InputValidationError(errorMessage);
     }
     return validationResult.data as TInput & { id: string };

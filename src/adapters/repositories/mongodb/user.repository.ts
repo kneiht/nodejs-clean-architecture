@@ -3,7 +3,10 @@ import { IUserRepository } from '@/application/dependency-interfaces/repositorie
 import { UserModel } from './schemas/user.schema.js';
 import { MongoRepository } from './base.repository.js';
 
-export class UserMongoRepository extends MongoRepository<User> implements IUserRepository {
+export class UserMongoRepository
+  extends MongoRepository<User>
+  implements IUserRepository
+{
   constructor() {
     super(UserModel);
   }

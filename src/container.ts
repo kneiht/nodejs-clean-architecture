@@ -1,9 +1,11 @@
-import { z } from 'zod';
 import {
   UserInMemoryRepository,
   PostInMemoryRepository,
 } from '@/adapters/repositories/in-memory/index.js';
-import { UserMongoRepository, PostMongoRepository } from '@/adapters/repositories/mongodb/index.js';
+import {
+  UserMongoRepository,
+  PostMongoRepository,
+} from '@/adapters/repositories/mongodb/index.js';
 import { PasswordHasher } from '@/adapters/utils/password.js';
 import { JsonWebToken } from '@/adapters/utils/jwt.js';
 import { env } from '@/config/environment.js';
@@ -36,7 +38,6 @@ import { RegisterUseCase } from '@/application/use-cases/auth/register.use-case.
 import { LoginUseCase } from '@/application/use-cases/auth/login.use-case.js';
 import { CheckAuthUseCase } from '@/application/use-cases/auth/check-auth.use-case.js';
 import { uuidv7 } from 'uuidv7';
-import { create } from 'domain';
 
 // Adapters
 const passwordHasher = new PasswordHasher();
@@ -44,14 +45,19 @@ const jsonWebToken = new JsonWebToken(env.JWT_SECRET);
 
 // Repositories
 const userRepository =
-  env.DB_SELECT === 'MONGODB' ? new UserMongoRepository() : new UserInMemoryRepository();
+  env.DB_SELECT === 'MONGODB'
+    ? new UserMongoRepository()
+    : new UserInMemoryRepository();
 const postRepository =
-  env.DB_SELECT === 'MONGODB' ? new PostMongoRepository() : new PostInMemoryRepository();
+  env.DB_SELECT === 'MONGODB'
+    ? new PostMongoRepository()
+    : new PostInMemoryRepository();
 
 // User use case dependencies
 const createUser = async (userCreateInput: CreateUserInput): Promise<User> =>
   await User.create(userCreateInput, uuidv7, passwordHasher.hash);
-const hydrateUser = (userHydrateInput: HydrateUserInput): User => User.hydrate(userHydrateInput);
+const hydrateUser = (userHydrateInput: HydrateUserInput): User =>
+  User.hydrate(userHydrateInput);
 
 // User use cases
 const addUserUseCase = new AddUseCase<User, CreateUserInput>(
@@ -73,7 +79,8 @@ const deleteUserUseCase = new DeleteUseCase<User>(userRepository, 'User');
 // Post use case dependencies
 const createPost = async (postCreateInput: CreatePostInput): Promise<Post> =>
   await Post.create(postCreateInput, uuidv7);
-const hydratePost = (postHydrateInput: HydratePostInput): Post => Post.hydrate(postHydrateInput);
+const hydratePost = (postHydrateInput: HydratePostInput): Post =>
+  Post.hydrate(postHydrateInput);
 
 // Post use cases
 const addPostUseCase = new AddUseCase<Post, CreatePostInput>(
@@ -94,7 +101,11 @@ const deletePostUseCase = new DeleteUseCase<Post>(postRepository, 'Post');
 
 // Auth use cases
 const registerUseCase = new RegisterUseCase(addUserUseCase, jsonWebToken);
-const loginUseCase = new LoginUseCase(userRepository, passwordHasher, jsonWebToken);
+const loginUseCase = new LoginUseCase(
+  userRepository,
+  passwordHasher,
+  jsonWebToken,
+);
 const checkAuthUseCase = new CheckAuthUseCase(jsonWebToken, userRepository);
 
 // Exports

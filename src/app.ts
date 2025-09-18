@@ -10,7 +10,6 @@ import { checkAuthUseCase } from './container.js';
 
 import { env } from './config/environment.js';
 import { connectDb } from './config/database.js';
-import { check } from 'zod';
 
 // Connection to MongoDB
 if (env.DB_SELECT === 'MONGODB') {

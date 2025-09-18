@@ -1,6 +1,10 @@
 import { IUseCase } from '@/application/use-cases/index.js';
 import { IBaseRepository } from '@/application/dependency-interfaces/repositories/base.repository.js';
-import { failureInternal, successOk, UseCaseReponse } from '@/application/use-cases/response.js';
+import {
+  failureInternal,
+  successOk,
+  UseCaseReponse,
+} from '@/application/use-cases/response.js';
 
 export class GetAllUseCase<T> implements IUseCase<void, T[]> {
   constructor(

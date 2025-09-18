@@ -1,6 +1,5 @@
 import z from 'zod';
 import { EntityValidationError } from './entity.error.js';
-import { IEntityStaticMethods } from './entity.interface.js';
 
 // Define param schemas
 const idSchema = z.string({ error: 'ID must be a string' });
@@ -74,7 +73,9 @@ export class User {
   validate(): void {
     const result = userSchema.safeParse(this);
     if (!result.success) {
-      throw new EntityValidationError(result.error.issues.map((iss) => iss.message).join(', '));
+      throw new EntityValidationError(
+        result.error.issues.map((iss) => iss.message).join(', '),
+      );
     }
   }
 
@@ -97,7 +98,9 @@ export class User {
     // Validate input
     const result = createUserInputSchema.safeParse(props);
     if (!result.success) {
-      throw new EntityValidationError(result.error.issues.map((iss) => iss.message).join(', '));
+      throw new EntityValidationError(
+        result.error.issues.map((iss) => iss.message).join(', '),
+      );
     }
     const id = idGenerator();
     const passwordHash = await hasher(props.password);
@@ -116,7 +119,9 @@ export class User {
     // Validate input
     const result = hydrateUserInputSchema.safeParse(props);
     if (!result.success) {
-      throw new EntityValidationError(result.error.issues.map((iss) => iss.message).join(', '));
+      throw new EntityValidationError(
+        result.error.issues.map((iss) => iss.message).join(', '),
+      );
     }
     return new User(props);
   }

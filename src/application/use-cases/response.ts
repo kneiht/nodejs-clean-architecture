@@ -94,11 +94,15 @@ export function failureValidation(
   return failure(message, ErrorType.VALIDATION, error);
 }
 
-export function failureNotFound(message = 'Resource not found'): UseCaseReponse {
+export function failureNotFound(
+  message = 'Resource not found',
+): UseCaseReponse {
   return failure(message, ErrorType.NOT_FOUND);
 }
 
-export function failureUnauthorized(message = 'Unauthorized access'): UseCaseReponse {
+export function failureUnauthorized(
+  message = 'Unauthorized access',
+): UseCaseReponse {
   return failure(message, ErrorType.UNAUTHORIZED);
 }
 
@@ -106,6 +110,8 @@ export function failureForbidden(message = 'Forbidden access'): UseCaseReponse {
   return failure(message, ErrorType.FORBIDDEN);
 }
 
-export function failureInternal(message = 'An internal server error occurred'): UseCaseReponse {
+export function failureInternal(
+  message = 'An internal server error occurred',
+): UseCaseReponse {
   return failure(message, ErrorType.INTERNAL);
 }

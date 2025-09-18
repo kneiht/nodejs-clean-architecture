@@ -1,12 +1,11 @@
 import { User } from '@/entities/user.entity.js';
 import { IUserRepository } from '@/application/dependency-interfaces/repositories/user.repository.js';
-import { PasswordHasher } from '@/adapters/utils/password.js';
 import { InMemoryRepository } from './base.repository.js';
-import { uuidv7 } from 'uuidv7';
 
-const passwordHasher = new PasswordHasher();
-
-export class UserInMemoryRepository extends InMemoryRepository<User> implements IUserRepository {
+export class UserInMemoryRepository
+  extends InMemoryRepository<User>
+  implements IUserRepository
+{
   constructor() {
     // Pass initial data to the base class
     super();

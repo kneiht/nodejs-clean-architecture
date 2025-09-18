@@ -26,10 +26,14 @@ export class DeleteUseCase<T> implements IUseCase<DeleteUseCaseInput, null> {
   ) {}
 
   // Handle input validation
-  protected async handleInput(input: DeleteUseCaseInput): Promise<DeleteUseCaseInput> {
+  protected async handleInput(
+    input: DeleteUseCaseInput,
+  ): Promise<DeleteUseCaseInput> {
     const validationResult = deleteByIdInputSchema.safeParse(input);
     if (!validationResult.success) {
-      const errorMessage = validationResult.error.issues.map((iss) => iss.message).join(', ');
+      const errorMessage = validationResult.error.issues
+        .map((iss) => iss.message)
+        .join(', ');
       throw new InputValidationError(errorMessage);
     }
     return validationResult.data;

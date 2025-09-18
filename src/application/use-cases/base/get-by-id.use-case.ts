@@ -19,17 +19,23 @@ const getByIdInputSchema = z.object({
 export type GetByIdUseCaseInput = z.infer<typeof getByIdInputSchema>;
 
 // Define the use case
-export class GetByIdUseCase<T> implements IUseCase<GetByIdUseCaseInput, T | null> {
+export class GetByIdUseCase<T>
+  implements IUseCase<GetByIdUseCaseInput, T | null>
+{
   constructor(
     private repository: IBaseRepository<T>,
     private entityName: string = 'Entity',
   ) {}
 
   // Handle input validation
-  protected async handleInput(input: GetByIdUseCaseInput): Promise<GetByIdUseCaseInput> {
+  protected async handleInput(
+    input: GetByIdUseCaseInput,
+  ): Promise<GetByIdUseCaseInput> {
     const validationResult = getByIdInputSchema.safeParse(input);
     if (!validationResult.success) {
-      const errorMessage = validationResult.error.issues.map((iss) => iss.message).join(', ');
+      const errorMessage = validationResult.error.issues
+        .map((iss) => iss.message)
+        .join(', ');
       throw new InputValidationError(errorMessage);
     }
     return validationResult.data;

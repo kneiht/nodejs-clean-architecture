@@ -1,6 +1,8 @@
 import { IBaseRepository } from '@/application/dependency-interfaces/repositories/base.repository.js';
 
-export class InMemoryRepository<T extends { id: string }> implements IBaseRepository<T> {
+export class InMemoryRepository<T extends { id: string }>
+  implements IBaseRepository<T>
+{
   constructor(protected items: T[] = []) {}
 
   async findById(id: string): Promise<T | null> {

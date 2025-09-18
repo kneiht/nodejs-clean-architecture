@@ -27,7 +27,11 @@
         border-radius: 9999px;
       }
       *::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, rgba(51, 65, 85, 0.95), rgba(30, 41, 59, 0.95));
+        background: linear-gradient(
+          180deg,
+          rgba(51, 65, 85, 0.95),
+          rgba(30, 41, 59, 0.95)
+        );
         border: 2px solid var(--scroll-track);
         border-radius: 9999px;
       }
@@ -42,11 +46,15 @@
   <body class="min-h-screen bg-slate-950 text-slate-100">
     <div class="max-w-6xl mx-auto p-6">
       <!-- Header -->
-      <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <header
+        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+      >
         <div class="flex items-center gap-3">
           <h1 class="text-xl font-semibold tracking-tight">Test APIs</h1>
         </div>
-        <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto] w-full md:w-[640px] items-end">
+        <div
+          class="grid gap-3 md:grid-cols-[1fr_1fr_auto] w-full md:w-[640px] items-end"
+        >
           <label class="text-xs text-slate-400">
             <span class="block mb-1">Base URL</span>
             <input
@@ -99,7 +107,9 @@
       <section id="tab-auth" class="mt-4 grid gap-4 md:grid-cols-2">
         <div class="grid gap-4">
           <!-- Register -->
-          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+          <div
+            class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow"
+          >
             <h3 class="font-medium mb-3">Register</h3>
             <div class="grid gap-3">
               <div class="grid md:grid-cols-2 gap-3">
@@ -138,12 +148,16 @@
                   Register
                 </button>
               </div>
-              <p class="text-xs text-slate-400">POST /auth/register { email, name, password }</p>
+              <p class="text-xs text-slate-400">
+                POST /auth/register { email, name, password }
+              </p>
             </div>
           </div>
 
           <!-- Login -->
-          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+          <div
+            class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow"
+          >
             <h3 class="font-medium mb-3">Login</h3>
             <div class="grid gap-3">
               <div class="grid md:grid-cols-2 gap-3">
@@ -189,12 +203,15 @@
                 >
               </div>
               <p class="text-xs text-slate-400">
-                POST /auth/login { email, password } • Token verify calls GET /users
+                POST /auth/login { email, password } • Token verify calls GET
+                /users
               </p>
             </div>
           </div>
         </div>
-        <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+        <div
+          class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow"
+        >
           <h3 class="font-medium mb-3">Result</h3>
           <pre
             id="auth-out"
@@ -206,7 +223,9 @@
       <!-- Users Tab -->
       <section id="tab-users" class="mt-4 grid gap-4 md:grid-cols-2 hidden">
         <div class="grid gap-4">
-          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+          <div
+            class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow"
+          >
             <h3 class="font-medium mb-3">All Users</h3>
             <button
               id="btn-users"
@@ -214,10 +233,14 @@
             >
               Fetch Users
             </button>
-            <p class="mt-2 text-xs text-slate-400">GET /users (requires Authorization)</p>
+            <p class="mt-2 text-xs text-slate-400">
+              GET /users (requires Authorization)
+            </p>
           </div>
 
-          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+          <div
+            class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow"
+          >
             <h3 class="font-medium mb-3">Create User</h3>
             <div class="grid gap-3">
               <div class="grid md:grid-cols-2 gap-3">
@@ -253,11 +276,15 @@
                   Create
                 </button>
               </div>
-              <p class="text-xs text-slate-400">POST /users { email, name, password }</p>
+              <p class="text-xs text-slate-400">
+                POST /users { email, name, password }
+              </p>
             </div>
           </div>
 
-          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+          <div
+            class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow"
+          >
             <h3 class="font-medium mb-3">By ID</h3>
             <div class="grid gap-3">
               <label class="text-xs text-slate-400">
@@ -308,7 +335,9 @@
             </div>
           </div>
         </div>
-        <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+        <div
+          class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow"
+        >
           <h3 class="font-medium mb-3">Result</h3>
           <pre
             id="user-out"
@@ -320,7 +349,9 @@
       <!-- Posts Tab -->
       <section id="tab-posts" class="mt-4 grid gap-4 md:grid-cols-2 hidden">
         <div class="grid gap-4">
-          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+          <div
+            class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow"
+          >
             <h3 class="font-medium mb-3">All Posts</h3>
             <button
               id="btn-posts"
@@ -328,10 +359,14 @@
             >
               Fetch Posts
             </button>
-            <p class="mt-2 text-xs text-slate-400">GET /posts (requires Authorization)</p>
+            <p class="mt-2 text-xs text-slate-400">
+              GET /posts (requires Authorization)
+            </p>
           </div>
 
-          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+          <div
+            class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow"
+          >
             <h3 class="font-medium mb-3">Create Post</h3>
             <div class="grid gap-3">
               <label class="text-xs text-slate-400">
@@ -369,7 +404,9 @@
             </div>
           </div>
 
-          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+          <div
+            class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow"
+          >
             <h3 class="font-medium mb-3">By ID</h3>
             <div class="grid gap-3">
               <label class="text-xs text-slate-400">
@@ -417,7 +454,9 @@
             </div>
           </div>
         </div>
-        <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow">
+        <div
+          class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow"
+        >
           <h3 class="font-medium mb-3">Result</h3>
           <pre
             id="post-out"
@@ -446,7 +485,8 @@
       }
       function setPill(ok) {
         const pill = $('auth-pill');
-        pill.textContent = ok === true ? 'ok' : ok === false ? 'invalid' : 'unknown';
+        pill.textContent =
+          ok === true ? 'ok' : ok === false ? 'invalid' : 'unknown';
         pill.className = `inline-flex items-center rounded-full border px-2 py-0.5 text-xs ${ok === true ? 'border-emerald-500 text-emerald-400' : ok === false ? 'border-rose-500 text-rose-400' : 'border-slate-700 text-slate-300'}`;
       }
       async function call(outEl, method, path, body, auth = false) {
@@ -455,9 +495,14 @@
           const res = await fetch(url, {
             method,
             headers: headers(auth),
-            body: method === 'GET' || method === 'DELETE' ? undefined : JSON.stringify(body ?? {}),
+            body:
+              method === 'GET' || method === 'DELETE'
+                ? undefined
+                : JSON.stringify(body ?? {}),
           });
-          const data = await res.json().catch(() => ({ raw: 'Non-JSON response' }));
+          const data = await res
+            .json()
+            .catch(() => ({ raw: 'Non-JSON response' }));
           if (outEl)
             outEl.textContent = JSON.stringify(
               { status: res.status, ok: res.ok, body: data },
@@ -466,7 +511,8 @@
             );
           return { res, data };
         } catch (e) {
-          if (outEl) outEl.textContent = JSON.stringify({ error: String(e) }, null, 2);
+          if (outEl)
+            outEl.textContent = JSON.stringify({ error: String(e) }, null, 2);
           return null;
         }
       }
@@ -494,7 +540,12 @@
           name: $('r-name').value.trim(),
           password: $('r-pass').value,
         };
-        const result = await call($('auth-out'), 'POST', '/auth/register', body);
+        const result = await call(
+          $('auth-out'),
+          'POST',
+          '/auth/register',
+          body,
+        );
         if (result?.data?.data?.token?.accessToken) {
           $('access-token').value = result.data.data.token.accessToken;
           setPill(true);
@@ -515,7 +566,13 @@
       });
       $('btn-verify').addEventListener('click', async () => {
         // Use protected route to validate token (works even if /auth/verify is not present)
-        const result = await call($('auth-out'), 'GET', '/users', undefined, true);
+        const result = await call(
+          $('auth-out'),
+          'GET',
+          '/users',
+          undefined,
+          true,
+        );
         setPill(!!result?.res?.ok);
       });
 
