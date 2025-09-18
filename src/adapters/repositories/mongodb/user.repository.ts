@@ -16,6 +16,11 @@ export class UserMongoRepository
     return doc as User | null;
   }
 
+  async findByName(name: string): Promise<User | null> {
+    const doc = await UserModel.findOne({ name }).exec();
+    return doc as User | null;
+  }
+
   // Override add and update to handle specific logic like password hashing and email case
   async add(user: User): Promise<User> {
     const userData = {

@@ -37,9 +37,7 @@ export type LoginUseCaseData = {
 };
 
 // Define the use case
-export class LoginUseCase
-  implements IUseCase<LoginUseCaseInput, LoginUseCaseData>
-{
+export class LoginUseCase implements IUseCase<LoginUseCaseInput> {
   // Inject dependencies
   constructor(
     private userRepository: IUserRepository,
@@ -106,7 +104,7 @@ export class LoginUseCase
     } catch (error) {
       // Handle other errors
       console.log(error);
-      return failureInternal('An unexpected error occurred during login.');
+      return failureInternal('Failed to login');
     }
   }
 }

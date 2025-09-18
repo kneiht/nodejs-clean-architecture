@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 export function logger(req: Request, res: Response, next: NextFunction) {
-  console.log(`${req.method} ${req.url} ${res.statusCode}`);
-  console.log(req.body);
+  console.log(`\n${req.method} ${req.url} ${res.statusCode}`);
+  console.log(`Body: ${req.body}`);
   next();
 }

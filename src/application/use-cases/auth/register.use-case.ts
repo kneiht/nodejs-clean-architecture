@@ -40,9 +40,7 @@ export type RegisterUseCaseData = {
 };
 
 // Define the use case
-export class RegisterUseCase
-  implements IUseCase<RegisterUseCaseInput, RegisterUseCaseData>
-{
+export class RegisterUseCase implements IUseCase<RegisterUseCaseInput> {
   // Inject dependencies
   constructor(
     private addUserUseCase: AddUserUseCase,
@@ -101,9 +99,7 @@ export class RegisterUseCase
     } catch (error) {
       // Handle other errors
       console.log(error);
-      return failureInternal(
-        'An unexpected error occurred during registration.',
-      );
+      return failureInternal('Failed to register');
     }
   }
 }

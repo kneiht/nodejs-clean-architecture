@@ -20,8 +20,8 @@ if (env.DB_SELECT === 'MONGODB') {
 const app = express();
 
 // Middlewares
-app.use(logger);
 app.use(express.json());
+app.use(logger);
 app.use(express.static('public'));
 const checkUserAuth = makeCheckAuthMiddleware(checkAuthUseCase, 'user');
 const checkAdminAuth = makeCheckAuthMiddleware(checkAuthUseCase, 'admin');

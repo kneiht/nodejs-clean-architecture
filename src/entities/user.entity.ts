@@ -1,21 +1,23 @@
 import z from 'zod';
 import { EntityValidationError } from './entity.error.js';
+import { BaseEntity } from './base.entity.js';
 
 // Define param schemas
-const idSchema = z.string({ error: 'ID must be a string' });
+const idSchema = z.string('ID must be a string');
 const nameSchema = z
   .string('Name must be a string')
-  .min(3, { error: 'Name must be at least 3 characters long' });
-const emailSchema = z.email({ error: 'Invalid email format' });
+  .min(3, 'Name must be at least 3 characters long');
+const emailSchema = z.email('Invalid email format');
 const passwordHashSchema = z
   .string('Password hash must be a string')
   .min(1, 'Password hash cannot be empty');
-const roleSchema = z.enum(['admin', 'user'], {
-  error: 'Role must be either admin or user',
-});
+const roleSchema = z.enum(
+  ['admin', 'user'],
+  'Role must be either admin or user',
+);
 const password = z
   .string('Password must be a string')
-  .min(6, { error: 'Password must be at least 6 characters long' });
+  .min(6, 'Password must be at least 6 characters long');
 
 // Define userSchema
 const userSchema = z.object({
@@ -36,16 +38,24 @@ export const createUserInputSchema = z.object({
   password: password,
 });
 
+// Define update input schema
+export const updateUserInputSchema = z.object({
+  id: idSchema,
+  name: nameSchema.optional(),
+  role: roleSchema.optional(),
+});
+
 // Define hydrate input schema
 export const hydrateUserInputSchema = userSchema;
 
 // Infer types
 export type UserType = z.infer<typeof userSchema>;
 export type CreateUserInput = z.infer<typeof createUserInputSchema>;
+export type UpdateUserInput = z.infer<typeof updateUserInputSchema>;
 export type HydrateUserInput = z.infer<typeof hydrateUserInputSchema>;
 
 // Define User class
-export class User {
+export class User extends BaseEntity {
   public readonly id: string;
   public email: string;
   public name?: string;
@@ -54,7 +64,10 @@ export class User {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  private constructor(props: UserType) {
+  public schema = userSchema;
+
+  protected constructor(props: UserType) {
+    super();
     this.id = props.id;
     this.email = props.email;
     this.name = props.name;
@@ -70,15 +83,6 @@ export class User {
     return this.passwordHash;
   }
 
-  validate(): void {
-    const result = userSchema.safeParse(this);
-    if (!result.success) {
-      throw new EntityValidationError(
-        result.error.issues.map((iss) => iss.message).join(', '),
-      );
-    }
-  }
-
   toJSON() {
     return {
       id: this.id,
@@ -90,11 +94,7 @@ export class User {
     };
   }
 
-  static async create(
-    props: CreateUserInput,
-    idGenerator: () => string,
-    hasher: (password: string) => Promise<string>,
-  ): Promise<User> {
+  static async create(props: CreateUserInput): Promise<User> {
     // Validate input
     const result = createUserInputSchema.safeParse(props);
     if (!result.success) {
@@ -102,8 +102,10 @@ export class User {
         result.error.issues.map((iss) => iss.message).join(', '),
       );
     }
-    const id = idGenerator();
-    const passwordHash = await hasher(props.password);
+
+    // Generate ID and hash password
+    const id = this.idGenerator();
+    const passwordHash = await this.passwordHasher(props.password);
     return new User({
       id,
       email: props.email,

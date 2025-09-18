@@ -47,9 +47,7 @@ export function statusCodeConverter(
 }
 
 // Define a basic controller for use cases
-export function basicController<UseCaseInput, UseCaseData>(
-  useCase: IUseCase<UseCaseInput, UseCaseData>,
-) {
+export function basicController<UseCaseInput>(useCase: IUseCase<UseCaseInput>) {
   return async (req: Request, res: Response) => {
     try {
       const input = extractor(req);

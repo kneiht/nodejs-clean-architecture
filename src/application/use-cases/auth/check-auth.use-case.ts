@@ -25,9 +25,7 @@ export type CheckAuthUseCaseInput = z.infer<typeof checkAuthInputSchema>;
 export type CheckAuthUseCaseData = User;
 
 // Define the use case
-export class CheckAuthUseCase
-  implements IUseCase<CheckAuthUseCaseInput, CheckAuthUseCaseData>
-{
+export class CheckAuthUseCase implements IUseCase<CheckAuthUseCaseInput> {
   // Inject dependencies
   constructor(
     private jsonWebToken: IJsonWebToken,
@@ -63,8 +61,10 @@ export class CheckAuthUseCase
       }
 
       // Check role
-      if (user.role !== roleToCheck) {
-        return failureUnauthorized('User role does not match');
+      if (user.role != 'admin') {
+        if (user.role !== roleToCheck) {
+          return failureUnauthorized('User role does not match');
+        }
       }
 
       // Return the user

@@ -1,5 +1,6 @@
 import z from 'zod';
 import { EntityValidationError } from './entity.error.js';
+import { BaseEntity } from './base.entity.js';
 
 // Define param schemas
 const idSchema = z.string({ error: 'ID must be a string' });
@@ -27,16 +28,24 @@ export const createPostInputSchema = z.object({
   userId: idSchema,
 });
 
+// Define update input schema
+export const updatePostInputSchema = z.object({
+  id: idSchema,
+  title: titleSchema.optional(),
+  content: contentSchema.optional(),
+});
+
 // Define hydrate input schema
 export const hydratePostInputSchema = postSchema;
 
 // Infer types
 export type PostType = z.infer<typeof postSchema>;
 export type CreatePostInput = z.infer<typeof createPostInputSchema>;
+export type UpdatePostInput = z.infer<typeof updatePostInputSchema>;
 export type HydratePostInput = z.infer<typeof hydratePostInputSchema>;
 
 // Define Post class
-export class Post {
+export class Post extends BaseEntity {
   public readonly id: string;
   public title: string;
   public content: string;
@@ -44,7 +53,9 @@ export class Post {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  private constructor(props: PostType) {
+  public schema = postSchema;
+  protected constructor(props: PostType) {
+    super();
     this.id = props.id;
     this.title = props.title;
     this.content = props.content;
@@ -53,15 +64,6 @@ export class Post {
     this.updatedAt = props.updatedAt;
     // Validate
     this.validate();
-  }
-
-  public validate(): void {
-    const result = postSchema.safeParse(this);
-    if (!result.success) {
-      throw new EntityValidationError(
-        result.error.issues.map((iss) => iss.message).join(', '),
-      );
-    }
   }
 
   public toJSON() {

@@ -1,3 +1,4 @@
+// Import Repository Inplementations
 import {
   UserInMemoryRepository,
   PostInMemoryRepository,
@@ -6,44 +7,41 @@ import {
   UserMongoRepository,
   PostMongoRepository,
 } from '@/adapters/repositories/mongodb/index.js';
+
+// Import dependencies for use cases
 import { PasswordHasher } from '@/adapters/utils/password.js';
 import { JsonWebToken } from '@/adapters/utils/jwt.js';
 import { env } from '@/config/environment.js';
 
 // Import Generic Use Cases
-import { AddUseCase } from '@/application/use-cases/base/add.use-case.js';
-import { DeleteUseCase } from '@/application/use-cases/base/delete.use-case.js';
-import { GetAllUseCase } from '@/application/use-cases/base/get-all.use-case.js';
-import { GetByIdUseCase } from '@/application/use-cases/base/get-by-id.use-case.js';
-import { UpdateUseCase } from '@/application/use-cases/base/update.use-case.js';
+import {
+  AddUseCase,
+  GetAllUseCase,
+  GetByIdUseCase,
+  UpdateUseCase,
+  DeleteByIdUseCase,
+} from '@/application/use-cases/index.js';
 
 // Import Entities and Interfaces
-import {
-  CreateUserInput,
-  createUserInputSchema,
-  HydrateUserInput,
-  hydrateUserInputSchema,
-  User,
-} from '@/entities/user.entity.js';
+import { UpdateUserInput } from '@/entities/user.entity.js';
+
 import {
   CreatePostInput,
-  createPostInputSchema,
-  HydratePostInput,
-  hydratePostInputSchema,
   Post,
+  UpdatePostInput,
 } from '@/entities/post.entity.js';
 
-// Auth use cases classes (these are not generic)
+// Auth use cases classes
 import { RegisterUseCase } from '@/application/use-cases/auth/register.use-case.js';
 import { LoginUseCase } from '@/application/use-cases/auth/login.use-case.js';
 import { CheckAuthUseCase } from '@/application/use-cases/auth/check-auth.use-case.js';
-import { uuidv7 } from 'uuidv7';
+import { AddUserUseCase } from './application/use-cases/user/add-user.use-case.js';
 
-// Adapters
+// Initialize dependencies
 const passwordHasher = new PasswordHasher();
 const jsonWebToken = new JsonWebToken(env.JWT_SECRET);
 
-// Repositories
+// Initialize repositories
 const userRepository =
   env.DB_SELECT === 'MONGODB'
     ? new UserMongoRepository()
@@ -53,51 +51,19 @@ const postRepository =
     ? new PostMongoRepository()
     : new PostInMemoryRepository();
 
-// User use case dependencies
-const createUser = async (userCreateInput: CreateUserInput): Promise<User> =>
-  await User.create(userCreateInput, uuidv7, passwordHasher.hash);
-const hydrateUser = (userHydrateInput: HydrateUserInput): User =>
-  User.hydrate(userHydrateInput);
-
 // User use cases
-const addUserUseCase = new AddUseCase<User, CreateUserInput>(
-  userRepository,
-  createUserInputSchema,
-  createUser,
-  'User',
-);
-const getAllUsersUseCase = new GetAllUseCase<User>(userRepository, 'User');
-const getUserByIdUseCase = new GetByIdUseCase<User>(userRepository, 'User');
-const updateUserUseCase = new UpdateUseCase<User, HydrateUserInput>(
-  userRepository,
-  hydrateUserInputSchema,
-  hydrateUser,
-  'User',
-);
-const deleteUserUseCase = new DeleteUseCase<User>(userRepository, 'User');
-
-// Post use case dependencies
-const createPost = async (postCreateInput: CreatePostInput): Promise<Post> =>
-  await Post.create(postCreateInput, uuidv7);
-const hydratePost = (postHydrateInput: HydratePostInput): Post =>
-  Post.hydrate(postHydrateInput);
+const addUserUseCase = new AddUserUseCase(userRepository);
+const getAllUsersUseCase = new GetAllUseCase(userRepository);
+const getUserByIdUseCase = new GetByIdUseCase(userRepository);
+const updateUserUseCase = new UpdateUseCase<UpdateUserInput>(userRepository);
+const deleteUserUseCase = new DeleteByIdUseCase(userRepository);
 
 // Post use cases
-const addPostUseCase = new AddUseCase<Post, CreatePostInput>(
-  postRepository,
-  createPostInputSchema,
-  createPost,
-  'Post',
-);
-const getAllPostsUseCase = new GetAllUseCase<Post>(postRepository, 'Post');
-const getPostByIdUseCase = new GetByIdUseCase<Post>(postRepository, 'Post');
-const updatePostUseCase = new UpdateUseCase<Post, HydratePostInput>(
-  postRepository,
-  hydratePostInputSchema,
-  hydratePost,
-  'Post',
-);
-const deletePostUseCase = new DeleteUseCase<Post>(postRepository, 'Post');
+const addPostUseCase = new AddUseCase<CreatePostInput>(Post, postRepository);
+const getAllPostsUseCase = new GetAllUseCase(postRepository);
+const getPostByIdUseCase = new GetByIdUseCase(postRepository);
+const updatePostUseCase = new UpdateUseCase<UpdatePostInput>(postRepository);
+const deletePostUseCase = new DeleteByIdUseCase(postRepository);
 
 // Auth use cases
 const registerUseCase = new RegisterUseCase(addUserUseCase, jsonWebToken);

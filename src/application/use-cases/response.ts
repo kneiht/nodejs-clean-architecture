@@ -4,6 +4,7 @@ export enum ErrorType {
   UNAUTHORIZED = 'UNAUTHORIZED',
   FORBIDDEN = 'FORBIDDEN',
   INTERNAL = 'INTERNAL',
+  CONFLICT = 'CONFLICT',
 }
 
 export enum SuccessType {
@@ -81,8 +82,8 @@ export function failure(
 ): UseCaseReponse {
   return {
     success: false,
-    message,
     type: errorType,
+    message,
     error,
   };
 }
@@ -114,4 +115,8 @@ export function failureInternal(
   message = 'An internal server error occurred',
 ): UseCaseReponse {
   return failure(message, ErrorType.INTERNAL);
+}
+
+export function failureConflict(message = 'Conflict'): UseCaseReponse {
+  return failure(message, ErrorType.CONFLICT);
 }

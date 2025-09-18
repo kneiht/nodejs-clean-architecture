@@ -5,20 +5,18 @@ import {
   successOk,
   UseCaseReponse,
 } from '@/application/use-cases/response.js';
+import { BaseEntity } from '@/entities/base.entity.js';
 
-export class GetAllUseCase<T> implements IUseCase<void, T[]> {
-  constructor(
-    private repository: IBaseRepository<T>,
-    private entityName: string = 'Entity',
-  ) {}
+export class GetAllUseCase implements IUseCase<void> {
+  constructor(private repository: IBaseRepository<BaseEntity>) {}
 
-  async execute(): Promise<UseCaseReponse<T[]>> {
+  async execute(): Promise<UseCaseReponse<BaseEntity[]>> {
     try {
       const entities = await this.repository.findAll();
       return successOk(entities);
     } catch (error) {
       console.error(error);
-      return failureInternal(`Failed to retrieve ${this.entityName}s.`);
+      return failureInternal(`Failed to retrieve`);
     }
   }
 }
