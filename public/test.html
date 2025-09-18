@@ -501,7 +501,10 @@
         }
       });
       $('btn-login').addEventListener('click', async () => {
-        const body = { email: $('l-email').value.trim(), password: $('l-pass').value };
+        const body = {
+          email: $('l-email').value.trim(),
+          password: $('l-pass').value,
+        };
         const result = await call($('auth-out'), 'POST', '/auth/login', body);
         if (result?.data?.data?.token?.accessToken) {
           $('access-token').value = result.data.data.token.accessToken;

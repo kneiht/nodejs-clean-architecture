@@ -10,6 +10,7 @@ import { checkAuthUseCase } from './container.js';
 
 import { env } from './config/environment.js';
 import { connectDb } from './config/database.js';
+import { check } from 'zod';
 
 // Connection to MongoDB
 if (env.DB_SELECT === 'MONGODB') {
@@ -28,8 +29,8 @@ const checkAdminAuth = makeCheckAuthMiddleware(checkAuthUseCase, 'admin');
 
 // Routes
 app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
-app.use('/posts', postRoutes);
+app.use('/users', checkAdminAuth, userRoutes);
+app.use('/posts', checkUserAuth, postRoutes);
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });

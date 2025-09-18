@@ -1,68 +1,21 @@
 import { User } from '@/entities/user.entity.js';
 import { IUserRepository } from '@/application/dependency-interfaces/repositories/user.repository.js';
 import { PasswordHasher } from '@/adapters/utils/password.js';
+import { InMemoryRepository } from './base.repository.js';
+import { uuidv7 } from 'uuidv7';
 
 const passwordHasher = new PasswordHasher();
 
-export class UserInMemoryRepository implements IUserRepository {
-  private users: User[] = [
-    new User({
-      email: 'admin@example.com',
-      name: 'Admin',
-      role: 'admin',
-      passwordHash: passwordHasher.hashSync('123123'),
-    }),
-    new User({
-      email: 'user1@example.com',
-      name: 'User 1',
-      role: 'user',
-      passwordHash: 'passwordHash1',
-    }),
-    new User({
-      email: 'user2@example.com',
-      name: 'User 2',
-      role: 'user',
-      passwordHash: 'passwordHash2',
-    }),
-    new User({
-      email: 'user3@example.com',
-      name: 'User 3',
-      role: 'user',
-      passwordHash: 'passwordHash3',
-    }),
-  ];
-
-  async findById(id: string): Promise<User | null> {
-    return this.users.find((user) => user.id === id) || null;
+export class UserInMemoryRepository extends InMemoryRepository<User> implements IUserRepository {
+  constructor() {
+    // Pass initial data to the base class
+    super();
   }
 
+  // Implement the specific method for IUserRepository
   async findByEmail(email: string): Promise<User | null> {
-    return this.users.find((user) => user.email === email) || null;
+    const user = this.items.find((user) => user.email === email);
+    return Promise.resolve(user || null);
   }
-
-  async findAll(): Promise<User[]> {
-    return this.users;
-  }
-
-  async add(user: User): Promise<User> {
-    this.users.push(user);
-    return user;
-  }
-
-  async update(user: User): Promise<User> {
-    const index = this.users.findIndex((u) => u.id === user.id);
-    if (index === -1) {
-      throw new Error('User not found');
-    }
-    this.users[index] = user;
-    return user;
-  }
-
-  async delete(user: User): Promise<void> {
-    const index = this.users.findIndex((u) => u.id === user.id);
-    if (index === -1) {
-      throw new Error('User not found');
-    }
-    this.users.splice(index, 1);
-  }
+  // CRUD are from the base class
 }
