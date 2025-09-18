@@ -30,12 +30,11 @@ export function makeCheckAuthMiddleware(
       // If the user is found, set it to the request and continue
       if (output.success) {
         req.user = output.data;
-        next();
+        return next();
       } else {
         // The response in the output of the use case has already handled errors
         return res.status(statusCodeConverter(output.type)).json(output);
       }
-      next();
     } catch (error) {
       return res.status(500).json({ success: false, message: error });
     }
